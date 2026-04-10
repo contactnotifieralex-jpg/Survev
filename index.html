@@ -1,898 +1,280 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Survev Clone - Battle Royale</title>
-    <style>
-        /* =========================================
-           CSS SÚPER CURADO - ESTILOS DEL JUEGO
-           ========================================= */
-        :root {
-            --bg-dark: #1a1a1a;
-            --panel-bg: #2d2d2d;
-            --primary: #4CAF50;
-            --primary-hover: #45a049;
-            --secondary: #2196F3;
-            --secondary-hover: #1976D2;
-            --danger: #f44336;
-            --text-light: #ffffff;
-            --text-muted: #aaaaaa;
-            --coin-color: #FFD700;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Battle Royale Web</title>
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            user-select: none;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #0f172a;
+    color: white;
+}
 
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-light);
-            overflow: hidden; /* Evita el scroll para el canvas */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            width: 100vw;
-        }
+.hidden { display: none; }
 
-        /* Utilidades */
-        .hidden { display: none !important; }
-        .screen {
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background: radial-gradient(circle at center, #333 0%, #111 100%);
-            z-index: 10;
-        }
+.container {
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
+}
 
-        /* Paneles y Contenedores */
-        .panel {
-            background: var(--panel-bg);
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            text-align: center;
-            min-width: 350px;
-            max-width: 800px;
-        }
+button {
+    padding: 10px;
+    margin: 5px;
+    background: #3b82f6;
+    border: none;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+}
 
-        h1 { margin-bottom: 20px; font-size: 2.5em; text-transform: uppercase; letter-spacing: 2px; }
-        h2 { margin-bottom: 15px; color: var(--text-muted); }
+input {
+    padding: 10px;
+    margin: 5px;
+    width: 100%;
+}
 
-        /* Formularios y Botones */
-        input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 5px;
-            background: #444;
-            color: white;
-            font-size: 16px;
-        }
-        input:focus { outline: 2px solid var(--primary); }
+.card {
+    background: #1e293b;
+    padding: 15px;
+    margin: 10px;
+    border-radius: 10px;
+}
 
-        button {
-            width: 100%;
-            padding: 15px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 8px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-transform: uppercase;
-        }
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+}
 
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-primary:hover { background: var(--primary-hover); transform: scale(1.02); }
-        
-        .btn-secondary { background: var(--secondary); color: white; }
-        .btn-secondary:hover { background: var(--secondary-hover); transform: scale(1.02); }
-        
-        .btn-danger { background: var(--danger); color: white; }
-        
-        .btn-small { padding: 10px; font-size: 14px; width: auto; margin: 5px; }
-
-        /* Interfaz de Lobby */
-        .top-bar {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(0,0,0,0.5);
-        }
-
-        .user-info { display: flex; align-items: center; gap: 15px; font-size: 20px; font-weight: bold; }
-        .coins { color: var(--coin-color); text-shadow: 0 0 5px rgba(255, 215, 0, 0.5); }
-
-        .lobby-content {
-            display: flex;
-            gap: 40px;
-            align-items: stretch;
-        }
-
-        .character-preview {
-            background: #444;
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            margin: 0 auto 20px auto;
-            border: 5px solid var(--primary);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 50px;
-        }
-
-        /* Tienda */
-        .shop-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 15px;
-            max-height: 400px;
-            overflow-y: auto;
-            padding: 10px;
-            margin-bottom: 20px;
-        }
-        .shop-grid::-webkit-scrollbar { width: 8px; }
-        .shop-grid::-webkit-scrollbar-thumb { background: #666; border-radius: 4px; }
-
-        .character-card {
-            background: #444;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .character-card:hover { background: #555; transform: translateY(-5px); }
-        .character-card.owned { border: 2px solid var(--primary); }
-        .character-card.equipped { border: 2px solid var(--coin-color); box-shadow: 0 0 10px var(--coin-color); }
-        
-        .char-icon { width: 60px; height: 60px; background: #222; border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; }
-
-        /* Juego (Canvas) */
-        #game-canvas {
-            display: block;
-            background: #718c5a; /* Color de pasto estilo survev */
-            z-index: 1;
-        }
-        #game-ui {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 2;
-        }
-        .alive-counter {
-            position: absolute;
-            top: 20px; right: 20px;
-            background: rgba(0,0,0,0.6);
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-size: 24px;
-            font-weight: bold;
-        }
-        
-        /* Modal de Resultados */
-        .result-modal {
-            background: rgba(0,0,0,0.9);
-        }
-        .result-coins { font-size: 3em; color: var(--coin-color); margin: 20px 0; }
-    </style>
+.character {
+    background: #334155;
+    padding: 10px;
+    text-align: center;
+    border-radius: 8px;
+}
+</style>
 </head>
+
 <body>
 
-    <div id="auth-screen" class="screen">
-        <div class="panel">
-            <h1>SURVEV CLONE</h1>
-            <h2>Inicia sesión o crea una cuenta</h2>
-            <input type="email" id="auth-email" placeholder="Correo electrónico" required>
-            <input type="password" id="auth-password" placeholder="Contraseña" required>
-            <button id="btn-login" class="btn-primary">Iniciar Sesión</button>
-            <button id="btn-register" class="btn-secondary">Crear Cuenta</button>
-            <p id="auth-error" style="color: var(--danger); margin-top: 10px; height: 20px;"></p>
-        </div>
-    </div>
+<div class="container">
 
-    <div id="lobby-screen" class="screen hidden">
-        <div class="top-bar">
-            <div class="user-info">
-                <span id="lobby-username">Jugador</span>
-                <span class="coins">🪙 <span id="lobby-coins">0</span></span>
-            </div>
-            <button id="btn-logout" class="btn-danger btn-small">Cerrar Sesión</button>
-        </div>
-        
-        <div class="lobby-content">
-            <div class="panel">
-                <h2>Tu Personaje</h2>
-                <div class="character-preview" id="current-char-preview">👤</div>
-                <h3 id="current-char-name" style="margin-bottom: 20px;">Personaje Base</h3>
-                <button id="btn-open-shop" class="btn-secondary">Cambiar / Tienda (125 Personajes)</button>
-            </div>
+<!-- LOGIN -->
+<div id="auth">
+    <h2>Login / Registro</h2>
+    <input id="email" placeholder="Email">
+    <input id="password" type="password" placeholder="Password">
+    <button onclick="register()">Registrarse</button>
+    <button onclick="login()">Iniciar sesión</button>
+</div>
 
-            <div class="panel">
-                <h2>Modos de Juego</h2>
-                <button id="btn-play-bots" class="btn-primary">Jugar con Bots (10 Jugadores)</button>
-                <hr style="border-color: #444; margin: 20px 0;">
-                <h2>Multijugador Online</h2>
-                <input type="text" id="join-room-code" placeholder="Código de Sala">
-                <button id="btn-join-room" class="btn-secondary">Unirse a Sala</button>
-                <button id="btn-create-room" class="btn-primary" style="background: #9c27b0;">Crear Sala</button>
-            </div>
-        </div>
-    </div>
+<!-- LOBBY -->
+<div id="lobby" class="hidden">
+    <h2>Lobby</h2>
+    <p>Monedas: <span id="coins">0</span></p>
 
-    <div id="shop-screen" class="screen hidden">
-        <div class="panel" style="max-width: 900px; width: 90%;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h1>Tienda de Personajes</h1>
-                <h2 class="coins">🪙 <span id="shop-coins">0</span></h2>
-            </div>
-            <p style="margin-bottom: 20px;">¡Desbloquea hasta 125 personajes únicos!</p>
-            
-            <div class="shop-grid" id="shop-container">
-                </div>
-            
-            <button id="btn-back-lobby" class="btn-danger">Volver al Lobby</button>
-        </div>
-    </div>
+    <button onclick="openShop()">Cambiar personaje</button>
+    <button onclick="openJoin()">Unirse a sala</button>
+    <button onclick="openPlay()">Jugar</button>
 
-    <div id="room-screen" class="screen hidden">
-        <div class="panel">
-            <h1>Sala Privada</h1>
-            <h2 id="room-code-display" style="color: var(--primary); font-size: 2em; letter-spacing: 5px;">CARGANDO...</h2>
-            <p>Comparte este código para que otros se unan.</p>
-            
-            <div style="margin: 20px 0; background: #222; padding: 15px; border-radius: 10px;">
-                <h3>Jugadores en la sala: <span id="room-player-count">1</span></h3>
-                <ul id="room-player-list" style="list-style: none; padding: 10px 0; text-align: left;">
-                    </ul>
-            </div>
+    <div id="shop" class="hidden"></div>
+    <div id="join" class="hidden"></div>
+    <div id="play" class="hidden"></div>
+</div>
 
-            <select id="map-selector" style="width: 100%; padding: 10px; margin-bottom: 20px; background: #444; color: white;">
-                <option value="forest">Mapa: Bosque (Clásico)</option>
-                <option value="desert">Mapa: Desierto</option>
-                <option value="snow">Mapa: Nieve</option>
-            </select>
+<!-- GAME -->
+<div id="game" class="hidden">
+    <h2>Partida</h2>
+    <p id="gameStatus"></p>
+</div>
 
-            <button id="btn-start-room" class="btn-primary" disabled>Empezar Partida (Mín 2 req.)</button>
-            <button id="btn-leave-room" class="btn-danger">Salir de la Sala</button>
-        </div>
-    </div>
+</div>
 
-    <div id="game-screen" class="screen hidden">
-        <canvas id="game-canvas"></canvas>
-        <div id="game-ui">
-            <div class="alive-counter">Vivos: <span id="alive-count">10</span></div>
-        </div>
-    </div>
+<script type="module">
 
-    <div id="result-screen" class="screen result-modal hidden">
-        <div class="panel">
-            <h1 id="result-title">¡FIN DE LA PARTIDA!</h1>
-            <h2>Posición: #<span id="result-rank">1</span></h2>
-            <div class="result-coins">+<span id="result-reward">0</span> 🪙</div>
-            <button id="btn-result-ok" class="btn-primary">Volver al Lobby</button>
-        </div>
-    </div>
+// FIREBASE
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } 
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-    <script type="module">
-        // 1. IMPORTACIONES DE FIREBASE
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getDatabase, ref, set, get, update, onValue, remove, onDisconnect } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
+const firebaseConfig = {
+apiKey: "AIzaSyD13N4-9MjTrmlPwGP7mves0Exje4v2ACw",
+authDomain: "kahoot-8529e.firebaseapp.com",
+databaseURL: "https://kahoot-8529e-default-rtdb.firebaseio.com",
+projectId: "kahoot-8529e",
+storageBucket: "kahoot-8529e.firebasestorage.app",
+messagingSenderId: "313414356056",
+appId: "1:313414356056:web:4aab4587f7df9393008e2d"
+};
 
-        // 2. CONFIGURACIÓN DE FIREBASE (Tus datos)
-        const firebaseConfig = {
-            apiKey: "AIzaSyD13N4-9MjTrmlPwGP7mves0Exje4v2ACw",
-            authDomain: "kahoot-8529e.firebaseapp.com",
-            databaseURL: "https://kahoot-8529e-default-rtdb.firebaseio.com",
-            projectId: "kahoot-8529e",
-            storageBucket: "kahoot-8529e.firebasestorage.app",
-            messagingSenderId: "313414356056",
-            appId: "1:313414356056:web:4aab4587f7df9393008e2d",
-            measurementId: "G-8T4CPC1BQ3"
-        };
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const auth = getAuth(app);
 
-        // Inicializar Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getDatabase(app);
-        const analytics = getAnalytics(app);
+let currentUser = null;
+let coins = 0;
+let ownedCharacters = ["Character 1"];
 
-        // ==========================================
-        // VARIABLES GLOBALES Y ESTADO
-        // ==========================================
-        let currentUser = null;
-        let userData = { coins: 0, ownedCharacters: [0], equippedCharacter: 0 };
-        let currentRoomId = null;
-        let isHost = false;
-        
-        // Motor del juego
-        let gameLoopId;
-        let gameState = {
-            isPlaying: false,
-            mode: 'bots', // 'bots' o 'online'
-            players: [],
-            projectiles: [],
-            zone: { x: 0, y: 0, radius: 2000 },
-            camera: { x: 0, y: 0 }
-        };
+// LOGIN / REGISTER
+window.register = async () => {
+    const email = document.getElementById("email").value;
+    const pass = document.getElementById("password").value;
 
-        // DOM Elements
-        const screens = {
-            auth: document.getElementById('auth-screen'),
-            lobby: document.getElementById('lobby-screen'),
-            shop: document.getElementById('shop-screen'),
-            room: document.getElementById('room-screen'),
-            game: document.getElementById('game-screen'),
-            result: document.getElementById('result-screen')
-        };
+    const user = await createUserWithEmailAndPassword(auth, email, pass);
+    currentUser = user.user;
 
-        // ==========================================
-        // BASE DE DATOS LOCAL: 125 PERSONAJES
-        // ==========================================
-        // Generamos dinámicamente 125 personajes para la tienda
-        const charactersDB = [];
-        const colors = ['#FF5733', '#33FF57', '#3357FF', '#F033FF', '#FFF033', '#33FFF0', '#FFFFFF', '#000000', '#8B4513', '#800080'];
-        for (let i = 0; i < 125; i++) {
-            let price = i === 0 ? 0 : Math.floor(i * 1.5) + 5; // Precio progresivo
-            charactersDB.push({
-                id: i,
-                name: i === 0 ? "Recluta Base" : `Soldado de Élite V${i}`,
-                price: price,
-                color: colors[i % colors.length]
-            });
-        }
+    await set(ref(db, "users/" + currentUser.uid), {
+        coins: 0,
+        characters: ["Character 1"]
+    });
 
-        // ==========================================
-        // FUNCIONES DE UTILIDAD (UI)
-        // ==========================================
-        function showScreen(screenName) {
-            Object.values(screens).forEach(s => s.classList.add('hidden'));
-            screens[screenName].classList.remove('hidden');
-        }
+    startLobby();
+};
 
-        function updateLobbyUI() {
-            document.getElementById('lobby-coins').innerText = userData.coins;
-            document.getElementById('shop-coins').innerText = userData.coins;
-            
-            const equipped = charactersDB[userData.equippedCharacter];
-            document.getElementById('current-char-name').innerText = equipped.name;
-            const preview = document.getElementById('current-char-preview');
-            preview.style.backgroundColor = equipped.color;
-        }
+window.login = async () => {
+    const email = document.getElementById("email").value;
+    const pass = document.getElementById("password").value;
 
-        // ==========================================
-        // SISTEMA DE AUTENTICACIÓN
-        // ==========================================
-        const emailInput = document.getElementById('auth-email');
-        const passInput = document.getElementById('auth-password');
-        const errorText = document.getElementById('auth-error');
+    const user = await signInWithEmailAndPassword(auth, email, pass);
+    currentUser = user.user;
 
-        document.getElementById('btn-login').addEventListener('click', () => {
-            signInWithEmailAndPassword(auth, emailInput.value, passInput.value)
-                .catch(err => errorText.innerText = "Error: " + err.message);
+    const snapshot = await get(ref(db, "users/" + currentUser.uid));
+    const data = snapshot.val();
+
+    coins = data.coins;
+    ownedCharacters = data.characters;
+
+    startLobby();
+};
+
+function startLobby() {
+    document.getElementById("auth").classList.add("hidden");
+    document.getElementById("lobby").classList.remove("hidden");
+    updateCoins();
+}
+
+// COINS
+function updateCoins() {
+    document.getElementById("coins").innerText = coins;
+}
+
+// SHOP
+window.openShop = () => {
+    const shop = document.getElementById("shop");
+    shop.classList.toggle("hidden");
+    shop.innerHTML = "<h3>Tienda</h3><div class='grid' id='chars'></div>";
+
+    const grid = document.getElementById("chars");
+
+    for (let i = 1; i <= 125; i++) {
+        let price = i * 2;
+        let name = "Character " + i;
+
+        let div = document.createElement("div");
+        div.className = "character";
+        div.innerHTML = `
+            <p>${name}</p>
+            <p>${price} coins</p>
+            <button onclick="buyCharacter('${name}', ${price})">Comprar</button>
+        `;
+        grid.appendChild(div);
+    }
+};
+
+window.buyCharacter = async (name, price) => {
+    if (coins >= price && !ownedCharacters.includes(name)) {
+        coins -= price;
+        ownedCharacters.push(name);
+
+        await set(ref(db, "users/" + currentUser.uid), {
+            coins,
+            characters: ownedCharacters
         });
 
-        document.getElementById('btn-register').addEventListener('click', () => {
-            createUserWithEmailAndPassword(auth, emailInput.value, passInput.value)
-                .then((userCredential) => {
-                    // Inicializar datos en DB para usuario nuevo
-                    const userRef = ref(db, 'users/' + userCredential.user.uid);
-                    set(userRef, { coins: 0, ownedCharacters: [0], equippedCharacter: 0 });
-                })
-                .catch(err => errorText.innerText = "Error: " + err.message);
-        });
+        updateCoins();
+        alert("Comprado!");
+    }
+};
 
-        document.getElementById('btn-logout').addEventListener('click', () => signOut(auth));
+// JOIN ROOM
+window.openJoin = () => {
+    const join = document.getElementById("join");
+    join.classList.toggle("hidden");
 
-        // Listener de estado de sesión
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                currentUser = user;
-                document.getElementById('lobby-username').innerText = user.email.split('@')[0];
-                
-                // Escuchar datos del usuario en tiempo real
-                const userRef = ref(db, 'users/' + user.uid);
-                onValue(userRef, (snapshot) => {
-                    if (snapshot.exists()) {
-                        userData = snapshot.val();
-                        // Asegurar formato por si acaso
-                        if (!userData.ownedCharacters) userData.ownedCharacters = [0];
-                        updateLobbyUI();
-                    }
-                });
-                showScreen('lobby');
-            } else {
-                currentUser = null;
-                showScreen('auth');
-            }
-        });
+    join.innerHTML = `
+        <h3>Unirse a sala</h3>
+        <input id="roomCode" placeholder="Código">
+        <button onclick="joinRoom()">Unirse</button>
+    `;
+};
 
-        // ==========================================
-        // SISTEMA DE TIENDA (125 PERSONAJES)
-        // ==========================================
-        document.getElementById('btn-open-shop').addEventListener('click', () => {
-            renderShop();
-            showScreen('shop');
-        });
+window.joinRoom = async () => {
+    const code = document.getElementById("roomCode").value;
 
-        document.getElementById('btn-back-lobby').addEventListener('click', () => showScreen('lobby'));
+    const snapshot = await get(ref(db, "rooms/" + code));
+    if (snapshot.exists()) {
+        alert("Te uniste a la sala!");
+    } else {
+        alert("Sala no existe");
+    }
+};
 
-        function renderShop() {
-            const container = document.getElementById('shop-container');
-            container.innerHTML = '';
+// PLAY MENU
+window.openPlay = () => {
+    const play = document.getElementById("play");
+    play.classList.toggle("hidden");
 
-            charactersDB.forEach(char => {
-                const card = document.createElement('div');
-                card.className = 'character-card';
-                
-                const isOwned = userData.ownedCharacters.includes(char.id);
-                const isEquipped = userData.equippedCharacter === char.id;
-                
-                if (isOwned) card.classList.add('owned');
-                if (isEquipped) card.classList.add('equipped');
+    play.innerHTML = `
+        <h3>Modo de juego</h3>
+        <button onclick="playBots()">Jugar con Bots</button>
+        <button onclick="createRoom()">Crear sala</button>
+    `;
+};
 
-                card.innerHTML = `
-                    <div class="char-icon" style="background-color: ${char.color}">👤</div>
-                    <div style="font-size: 12px; font-weight: bold;">${char.name}</div>
-                    <div style="margin-top: 5px; color: ${isOwned ? '#4CAF50' : 'var(--coin-color)'};">
-                        ${isEquipped ? 'EQUIPADO' : (isOwned ? 'COMPRADO' : `🪙 ${char.price}`)}
-                    </div>
-                `;
+// BOT GAME
+window.playBots = () => {
+    document.getElementById("lobby").classList.add("hidden");
+    document.getElementById("game").classList.remove("hidden");
 
-                card.addEventListener('click', () => handleCharacterClick(char, isOwned));
-                container.appendChild(card);
-            });
+    let players = 10;
+
+    let interval = setInterval(() => {
+        players--;
+        document.getElementById("gameStatus").innerText = "Jugadores restantes: " + players;
+
+        if (players <= 1) {
+            clearInterval(interval);
+
+            let reward = Math.floor(Math.random() * 3);
+
+            if (reward === 0) coins += 10;
+            if (reward === 1) coins += 5;
+            if (reward === 2) coins += 2;
+
+            alert("Fin de partida! Monedas ganadas!");
+            location.reload();
         }
+    }, 1000);
+};
 
-        function handleCharacterClick(char, isOwned) {
-            const userRef = ref(db, 'users/' + currentUser.uid);
-            if (isOwned) {
-                // Equipar
-                update(userRef, { equippedCharacter: char.id });
-            } else {
-                // Comprar
-                if (userData.coins >= char.price) {
-                    const newOwned = [...userData.ownedCharacters, char.id];
-                    update(userRef, { 
-                        coins: userData.coins - char.price,
-                        ownedCharacters: newOwned,
-                        equippedCharacter: char.id
-                    });
-                } else {
-                    alert("No tienes suficientes monedas.");
-                }
-            }
-            setTimeout(renderShop, 100); // Pequeño delay para asegurar firebase sync
-        }
+// CREATE ROOM
+window.createRoom = async () => {
+    const code = Math.random().toString(36).substring(2, 8);
 
-        // ==========================================
-        // SISTEMA DE SALAS MULTIJUGADOR (LOBBY)
-        // ==========================================
-        document.getElementById('btn-create-room').addEventListener('click', () => {
-            const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-            currentRoomId = code;
-            isHost = true;
-            
-            const roomRef = ref(db, 'rooms/' + code);
-            set(roomRef, {
-                status: 'waiting',
-                map: 'forest',
-                host: currentUser.uid,
-                players: {
-                    [currentUser.uid]: { name: currentUser.email.split('@')[0], ready: true }
-                }
-            });
+    await set(ref(db, "rooms/" + code), {
+        players: [currentUser.uid],
+        map: "default"
+    });
 
-            // Borrar sala si el host se desconecta
-            onDisconnect(roomRef).remove();
-            
-            initRoomListener(code);
-            document.getElementById('room-code-display').innerText = code;
-            document.getElementById('btn-start-room').style.display = 'block';
-            document.getElementById('map-selector').style.display = 'block';
-            showScreen('room');
-        });
+    alert("Sala creada: " + code);
+};
 
-        document.getElementById('btn-join-room').addEventListener('click', () => {
-            const code = document.getElementById('join-room-code').value.toUpperCase();
-            if (!code) return;
+</script>
 
-            get(ref(db, 'rooms/' + code)).then((snapshot) => {
-                if (snapshot.exists() && snapshot.val().status === 'waiting') {
-                    currentRoomId = code;
-                    isHost = false;
-                    
-                    const playerRef = ref(db, `rooms/${code}/players/${currentUser.uid}`);
-                    set(playerRef, { name: currentUser.email.split('@')[0], ready: true });
-                    onDisconnect(playerRef).remove();
-
-                    initRoomListener(code);
-                    document.getElementById('room-code-display').innerText = code;
-                    document.getElementById('btn-start-room').style.display = 'none'; // Solo host empieza
-                    document.getElementById('map-selector').style.display = 'none'; // Solo host elige mapa
-                    showScreen('room');
-                } else {
-                    alert("Sala no encontrada o partida ya iniciada.");
-                }
-            });
-        });
-
-        document.getElementById('btn-leave-room').addEventListener('click', () => {
-            if (currentRoomId) {
-                if (isHost) {
-                    remove(ref(db, 'rooms/' + currentRoomId));
-                } else {
-                    remove(ref(db, `rooms/${currentRoomId}/players/${currentUser.uid}`));
-                }
-                currentRoomId = null;
-                showScreen('lobby');
-            }
-        });
-
-        function initRoomListener(code) {
-            const roomRef = ref(db, 'rooms/' + code);
-            onValue(roomRef, (snapshot) => {
-                if (!snapshot.exists()) {
-                    if (currentRoomId) { alert("El host cerró la sala."); currentRoomId = null; showScreen('lobby'); }
-                    return;
-                }
-                
-                const data = snapshot.val();
-                
-                // Actualizar lista de jugadores
-                const players = data.players || {};
-                const count = Object.keys(players).length;
-                document.getElementById('room-player-count').innerText = count;
-                
-                const listEl = document.getElementById('room-player-list');
-                listEl.innerHTML = '';
-                for (let uid in players) {
-                    listEl.innerHTML += `<li>🟢 ${players[uid].name} ${uid === data.host ? '(Host)' : ''}</li>`;
-                }
-
-                // Activar botón de start si hay 2+
-                if (isHost) {
-                    document.getElementById('btn-start-room').disabled = count < 2;
-                }
-
-                // Iniciar partida si el host cambia el estado
-                if (data.status === 'playing' && !gameState.isPlaying) {
-                    startGame('online', data.map, Object.keys(players).length);
-                }
-            });
-        }
-
-        document.getElementById('map-selector').addEventListener('change', (e) => {
-            if (isHost && currentRoomId) {
-                update(ref(db, 'rooms/' + currentRoomId), { map: e.target.value });
-            }
-        });
-
-        document.getElementById('btn-start-room').addEventListener('click', () => {
-            if (isHost && currentRoomId) {
-                update(ref(db, 'rooms/' + currentRoomId), { status: 'playing' });
-            }
-        });
-
-        // ==========================================
-        // BOTÓN JUGAR CON BOTS
-        // ==========================================
-        document.getElementById('btn-play-bots').addEventListener('click', () => {
-            startGame('bots', 'forest', 10); // 1 jugador real + 9 bots
-        });
-
-        // ==========================================
-        // MOTOR DE JUEGO (CANVAS 2D) - LA MAGIA
-        // ==========================================
-        const canvas = document.getElementById('game-canvas');
-        const ctx = canvas.getContext('2d');
-        
-        // Controles de teclado
-        const keys = { w: false, a: false, s: false, d: false };
-        window.addEventListener('keydown', e => { if(keys.hasOwnProperty(e.key.toLowerCase())) keys[e.key.toLowerCase()] = true; });
-        window.addEventListener('keyup', e => { if(keys.hasOwnProperty(e.key.toLowerCase())) keys[e.key.toLowerCase()] = false; });
-        
-        // Ratón para apuntar y disparar
-        let mouse = { x: 0, y: 0, isDown: false };
-        canvas.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
-        canvas.addEventListener('mousedown', () => mouse.isDown = true);
-        canvas.addEventListener('mouseup', () => mouse.isDown = false);
-
-        class Entity {
-            constructor(x, y, isBot, id, color) {
-                this.id = id;
-                this.x = x;
-                this.y = y;
-                this.radius = 20;
-                this.speed = 3;
-                this.isBot = isBot;
-                this.health = 100;
-                this.color = color;
-                this.lastShot = 0;
-            }
-
-            draw(ctx, cameraX, cameraY) {
-                if (this.health <= 0) return;
-                ctx.beginPath();
-                ctx.arc(this.x - cameraX, this.y - cameraY, this.radius, 0, Math.PI * 2);
-                ctx.fillStyle = this.color;
-                ctx.fill();
-                ctx.lineWidth = 3;
-                ctx.strokeStyle = '#000';
-                ctx.stroke();
-
-                // Barra de vida
-                ctx.fillStyle = 'red';
-                ctx.fillRect(this.x - cameraX - 20, this.y - cameraY - 30, 40, 5);
-                ctx.fillStyle = 'green';
-                ctx.fillRect(this.x - cameraX - 20, this.y - cameraY - 30, 40 * (this.health/100), 5);
-            }
-        }
-
-        class Projectile {
-            constructor(x, y, angle, ownerId) {
-                this.x = x;
-                this.y = y;
-                this.vx = Math.cos(angle) * 15;
-                this.vy = Math.sin(angle) * 15;
-                this.ownerId = ownerId;
-                this.life = 100;
-            }
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
-                this.life--;
-            }
-            draw(ctx, cameraX, cameraY) {
-                ctx.beginPath();
-                ctx.arc(this.x - cameraX, this.y - cameraY, 5, 0, Math.PI*2);
-                ctx.fillStyle = '#ffeb3b';
-                ctx.fill();
-            }
-        }
-
-        function startGame(mode, mapConfig, totalPlayers) {
-            gameState.isPlaying = true;
-            gameState.mode = mode;
-            gameState.players = [];
-            gameState.projectiles = [];
-            gameState.zone = { x: 1000, y: 1000, radius: 2000 };
-            
-            showScreen('game');
-            resizeCanvas();
-            window.addEventListener('resize', resizeCanvas);
-
-            // Cambiar color del mapa
-            canvas.style.background = mapConfig === 'desert' ? '#e0c68e' : (mapConfig === 'snow' ? '#e0e0e0' : '#718c5a');
-
-            const myColor = charactersDB[userData.equippedCharacter].color;
-
-            // Instanciar jugador principal
-            gameState.players.push(new Entity(1000, 1000, false, 'local', myColor));
-
-            // Instanciar Bots (si es modo bot)
-            if (mode === 'bots') {
-                for(let i=0; i < totalPlayers - 1; i++) {
-                    let rx = Math.random() * 2000;
-                    let ry = Math.random() * 2000;
-                    let botColor = colors[Math.floor(Math.random() * colors.length)];
-                    gameState.players.push(new Entity(rx, ry, true, `bot_${i}`, botColor));
-                }
-            } else {
-                // En modo online real, aquí escucharíamos las posiciones de firebase.
-                // Como es una limitación hacerlo puramente client-side sin backend, 
-                // para este demo lo dejamos funcional localmente mostrando solo la UI multijugador.
-            }
-
-            requestAnimationFrame(gameLoop);
-        }
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-
-        function gameLoop() {
-            if (!gameState.isPlaying) return;
-            
-            updateLogic();
-            render();
-            
-            checkWinCondition();
-
-            if (gameState.isPlaying) {
-                gameLoopId = requestAnimationFrame(gameLoop);
-            }
-        }
-
-        function updateLogic() {
-            const localPlayer = gameState.players.find(p => p.id === 'local');
-            if (!localPlayer) return; // Muerto
-
-            // Movimiento Jugador Local
-            if(keys.w) localPlayer.y -= localPlayer.speed;
-            if(keys.s) localPlayer.y += localPlayer.speed;
-            if(keys.a) localPlayer.x -= localPlayer.speed;
-            if(keys.d) localPlayer.x += localPlayer.speed;
-
-            // Restringir mapa general
-            localPlayer.x = Math.max(0, Math.min(2000, localPlayer.x));
-            localPlayer.y = Math.max(0, Math.min(2000, localPlayer.y));
-
-            // Disparo Jugador Local
-            if (mouse.isDown && Date.now() - localPlayer.lastShot > 200) {
-                // Calcular ángulo hacia el ratón considerando la cámara
-                let dx = (mouse.x + gameState.camera.x) - localPlayer.x;
-                let dy = (mouse.y + gameState.camera.y) - localPlayer.y;
-                let angle = Math.atan2(dy, dx);
-                gameState.projectiles.push(new Projectile(localPlayer.x, localPlayer.y, angle, localPlayer.id));
-                localPlayer.lastShot = Date.now();
-            }
-
-            // Cámara sigue al jugador
-            gameState.camera.x = localPlayer.x - canvas.width / 2;
-            gameState.camera.y = localPlayer.y - canvas.height / 2;
-
-            // Zona segura menguante
-            gameState.zone.radius -= 0.2;
-            if (gameState.zone.radius < 50) gameState.zone.radius = 50;
-
-            // Daño por zona (Tormenta)
-            gameState.players.forEach(p => {
-                let distToCenter = Math.hypot(p.x - gameState.zone.x, p.y - gameState.zone.y);
-                if (distToCenter > gameState.zone.radius) {
-                    p.health -= 0.1; // Daño constante fuera de zona
-                }
-            });
-
-            // Lógica de Bots Básica
-            gameState.players.filter(p => p.isBot && p.health > 0).forEach(bot => {
-                // Moverse hacia la zona segura aleatoriamente
-                if (Math.random() < 0.05) {
-                    bot.vx = (Math.random() - 0.5) * 2;
-                    bot.vy = (Math.random() - 0.5) * 2;
-                }
-                // Si la zona es pequeña, forzar ir al centro
-                if (Math.hypot(bot.x - gameState.zone.x, bot.y - gameState.zone.y) > gameState.zone.radius - 50) {
-                    let angle = Math.atan2(gameState.zone.y - bot.y, gameState.zone.x - bot.x);
-                    bot.vx = Math.cos(angle);
-                    bot.vy = Math.sin(angle);
-                }
-
-                bot.x += (bot.vx || 0) * bot.speed;
-                bot.y += (bot.vy || 0) * bot.speed;
-
-                // Disparar aleatoriamente si hay alguien cerca
-                if (Date.now() - bot.lastShot > 800 && Math.random() < 0.02) {
-                    let angle = Math.random() * Math.PI * 2;
-                    gameState.projectiles.push(new Projectile(bot.x, bot.y, angle, bot.id));
-                    bot.lastShot = Date.now();
-                }
-            });
-
-            // Actualizar Proyectiles y Colisiones
-            for (let i = gameState.projectiles.length - 1; i >= 0; i--) {
-                let proj = gameState.projectiles[i];
-                proj.update();
-                
-                // Checar colisión con jugadores
-                gameState.players.forEach(p => {
-                    if (p.health > 0 && p.id !== proj.ownerId) {
-                        let dist = Math.hypot(p.x - proj.x, p.y - proj.y);
-                        if (dist < p.radius) {
-                            p.health -= 15; // Daño bala
-                            proj.life = 0; // Destruir bala
-                        }
-                    }
-                });
-
-                if (proj.life <= 0) gameState.projectiles.splice(i, 1);
-            }
-
-            // Filtrar muertos
-            const aliveBefore = gameState.players.length;
-            gameState.players = gameState.players.filter(p => p.health > 0);
-            
-            document.getElementById('alive-count').innerText = gameState.players.length;
-        }
-
-        function render() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Dibujar fondo del mapa (cuadrícula opcional para sentir el movimiento)
-            ctx.strokeStyle = 'rgba(0,0,0,0.1)';
-            for(let i=0; i<2000; i+=100) {
-                ctx.beginPath(); ctx.moveTo(i - gameState.camera.x, -gameState.camera.y); ctx.lineTo(i - gameState.camera.x, 2000 - gameState.camera.y); ctx.stroke();
-                ctx.beginPath(); ctx.moveTo(-gameState.camera.x, i - gameState.camera.y); ctx.lineTo(2000 - gameState.camera.x, i - gameState.camera.y); ctx.stroke();
-            }
-
-            // Dibujar Zona Segura (roja/oscura fuera)
-            ctx.fillStyle = 'rgba(255, 0, 0, 0.2)';
-            ctx.beginPath();
-            // Truco para oscurecer el exterior: dibujar un rect grande y recortar un círculo
-            ctx.rect(-gameState.camera.x - 1000, -gameState.camera.y - 1000, 4000, 4000);
-            ctx.arc(gameState.zone.x - gameState.camera.x, gameState.zone.y - gameState.camera.y, gameState.zone.radius, 0, Math.PI * 2, true);
-            ctx.fill();
-
-            // Dibujar línea de la zona segura
-            ctx.beginPath();
-            ctx.arc(gameState.zone.x - gameState.camera.x, gameState.zone.y - gameState.camera.y, gameState.zone.radius, 0, Math.PI * 2);
-            ctx.strokeStyle = 'white';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-
-            // Dibujar jugadores
-            gameState.players.forEach(p => p.draw(ctx, gameState.camera.x, gameState.camera.y));
-
-            // Dibujar proyectiles
-            gameState.projectiles.forEach(p => p.draw(ctx, gameState.camera.x, gameState.camera.y));
-        }
-
-        // ==========================================
-        // LÓGICA DE RECOMPENSAS Y FIN DE PARTIDA
-        // ==========================================
-        function checkWinCondition() {
-            const localPlayerAlive = gameState.players.some(p => p.id === 'local');
-            const totalAlive = gameState.players.length;
-
-            if (!localPlayerAlive || totalAlive <= 1) {
-                endGame(totalAlive + (localPlayerAlive ? 0 : 1)); // Calcular rank
-            }
-        }
-
-        function endGame(rank) {
-            gameState.isPlaying = false;
-            
-            let reward = 0;
-            if (rank === 1) reward = 10;
-            else if (rank === 2) reward = 5;
-            else if (rank === 3) reward = 2;
-
-            document.getElementById('result-rank').innerText = rank;
-            document.getElementById('result-reward').innerText = reward;
-            document.getElementById('result-title').innerText = rank === 1 ? "¡VICTORIA MAGISTRAL!" : "FIN DE LA PARTIDA";
-            
-            showScreen('result');
-
-            // Actualizar monedas en Firebase si ganamos algo
-            if (reward > 0 && currentUser) {
-                const userRef = ref(db, 'users/' + currentUser.uid);
-                update(userRef, { coins: userData.coins + reward });
-            }
-
-            // Limpiar sala si estábamos en multi
-            if (currentRoomId) {
-                remove(ref(db, 'rooms/' + currentRoomId));
-                currentRoomId = null;
-            }
-        }
-
-        document.getElementById('btn-result-ok').addEventListener('click', () => {
-            showScreen('lobby');
-        });
-
-    </script>
 </body>
 </html>

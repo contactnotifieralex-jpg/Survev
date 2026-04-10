@@ -250,15 +250,6 @@
   .toast.info{border-color:rgba(0,255,231,0.3);color:var(--neon);}
   @keyframes toastIn{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
 
-  /* ========== LOADING ========== */
-  #loading-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:var(--dark);z-index:200;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:20px;}
-  .loading-logo{font-family:'Orbitron',sans-serif;font-size:40px;font-weight:900;background:linear-gradient(135deg,var(--neon),var(--neon2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-  .loading-bar{width:260px;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;}
-  .loading-progress{height:100%;background:linear-gradient(90deg,var(--neon),var(--neon2));border-radius:2px;animation:loadAnim 1.5s ease-out forwards;}
-  @keyframes loadAnim{from{width:0%;}to{width:100%;}}
-  .loading-text{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px;color:var(--text);animation:pulse 1s infinite;}
-  @keyframes pulse{0%,100%{opacity:0.4;}50%{opacity:1;}}
-
   /* Countdown overlay */
   #countdown-overlay{position:fixed;top:0;left:0;width:100%;height:100%;z-index:50;display:none;align-items:center;justify-content:center;pointer-events:none;}
   .countdown-num{font-family:'Orbitron',sans-serif;font-size:160px;font-weight:900;color:var(--neon);text-shadow:0 0 60px rgba(0,255,231,0.8);animation:countPop .9s ease-out;}

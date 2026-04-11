@@ -1,280 +1,704 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Battle Royale Web</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>SURVIVAL ARENA - Juego estilo Survev</title>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
 
-<style>
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #0f172a;
-    color: white;
-}
+        body {
+            background: linear-gradient(145deg, #0a0f1e 0%, #0c1222 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Poppins', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            padding: 20px;
+        }
 
-.hidden { display: none; }
+        /* Contenedor principal de paneles */
+        .panel {
+            background: rgba(18, 25, 45, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 48px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+            transition: all 0.3s ease;
+            color: #f0f3fa;
+        }
 
-.container {
-    max-width: 900px;
-    margin: auto;
-    padding: 20px;
-}
+        .game-container {
+            max-width: 1200px;
+            width: 100%;
+            padding: 0;
+            background: transparent;
+            backdrop-filter: none;
+            box-shadow: none;
+        }
 
-button {
-    padding: 10px;
-    margin: 5px;
-    background: #3b82f6;
-    border: none;
-    color: white;
-    cursor: pointer;
-    border-radius: 5px;
-}
+        canvas {
+            display: block;
+            margin: 0 auto;
+            border-radius: 28px;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.5), 0 0 0 2px rgba(255,215,0,0.2);
+            cursor: crosshair;
+        }
 
-input {
-    padding: 10px;
-    margin: 5px;
-    width: 100%;
-}
+        h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #FFD966, #FFA500);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 20px;
+            text-align: center;
+        }
 
-.card {
-    background: #1e293b;
-    padding: 15px;
-    margin: 10px;
-    border-radius: 10px;
-}
+        input, button {
+            width: 100%;
+            padding: 14px 18px;
+            margin: 8px 0;
+            border-radius: 60px;
+            border: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
 
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 10px;
-}
+        input {
+            background: #1e2a3e;
+            color: white;
+            border: 1px solid #3a4a62;
+        }
 
-.character {
-    background: #334155;
-    padding: 10px;
-    text-align: center;
-    border-radius: 8px;
-}
-</style>
+        button {
+            background: linear-gradient(90deg, #ff8c00, #ff2e00);
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(255, 60, 0, 0.4);
+        }
+
+        button:hover {
+            transform: scale(1.02);
+            filter: brightness(1.05);
+        }
+
+        .secondary-btn {
+            background: #2c3e5c;
+            box-shadow: none;
+        }
+
+        .grid-personajes {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+            margin-top: 15px;
+            border-radius: 28px;
+            background: rgba(0,0,0,0.3);
+        }
+
+        .personaje-card {
+            background: #1f2a3e;
+            border-radius: 24px;
+            padding: 10px 5px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.1s;
+            border: 1px solid #4a627a;
+        }
+        .personaje-card.selected {
+            border: 3px solid gold;
+            background: #2a3b55;
+        }
+        .personaje-emoji {
+            font-size: 2.5rem;
+        }
+        .monedas {
+            font-size: 1.3rem;
+            background: #00000066;
+            display: inline-block;
+            padding: 6px 18px;
+            border-radius: 40px;
+            margin-bottom: 15px;
+        }
+        .lobby-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .badge {
+            background: #f5a623;
+            color: #1e1e2a;
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-weight: bold;
+        }
+        .oculto {
+            display: none !important;
+        }
+        .flex-btns {
+            display: flex;
+            gap: 12px;
+            margin: 15px 0;
+        }
+        .sala-info {
+            background: #00000055;
+            border-radius: 28px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e2a36;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #ff8c00;
+            border-radius: 10px;
+        }
+    </style>
 </head>
-
 <body>
 
-<div class="container">
-
-<!-- LOGIN -->
-<div id="auth">
-    <h2>Login / Registro</h2>
-    <input id="email" placeholder="Email">
-    <input id="password" type="password" placeholder="Password">
-    <button onclick="register()">Registrarse</button>
-    <button onclick="login()">Iniciar sesión</button>
+<!-- PANEL DE AUTENTICACIÓN -->
+<div id="authPanel" class="panel">
+    <h2>🔥 ARENA SURVIVAL</h2>
+    <div style="text-align:center; margin-bottom:20px;">⚔️ Battle Royale extremo ⚔️</div>
+    <input type="email" id="loginEmail" placeholder="Correo electrónico">
+    <input type="password" id="loginPass" placeholder="Contraseña">
+    <button id="loginBtn">🔐 INICIAR SESIÓN</button>
+    <button id="registerBtn" class="secondary-btn">✨ CREAR CUENTA NUEVA</button>
 </div>
 
-<!-- LOBBY -->
-<div id="lobby" class="hidden">
-    <h2>Lobby</h2>
-    <p>Monedas: <span id="coins">0</span></p>
-
-    <button onclick="openShop()">Cambiar personaje</button>
-    <button onclick="openJoin()">Unirse a sala</button>
-    <button onclick="openPlay()">Jugar</button>
-
-    <div id="shop" class="hidden"></div>
-    <div id="join" class="hidden"></div>
-    <div id="play" class="hidden"></div>
+<!-- LOBBY PRINCIPAL (después de login) -->
+<div id="lobbyPanel" class="panel oculto">
+    <div class="lobby-header">
+        <h2>🏆 LOBBY</h2>
+        <div class="monedas">🪙 <span id="userCoins">0</span></div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px; margin: 10px 0;">
+        <div style="background:#1e2a3a; border-radius: 60px; padding: 5px 15px;">👤 <span id="userEmailDisplay"></span></div>
+        <div>🎭 Personaje: <span id="activeCharName">#1</span></div>
+    </div>
+    <div class="flex-btns">
+        <button id="changeCharBtn">🎨 CAMBIAR PERSONAJE</button>
+        <button id="joinRoomBtn">🔗 UNIRSE POR CÓDIGO</button>
+    </div>
+    <button id="playBtn" style="background: #2ecc71;">▶️ JUGAR</button>
+    <button id="logoutBtn" class="secondary-btn" style="margin-top: 12px;">🚪 CERRAR SESIÓN</button>
 </div>
 
-<!-- GAME -->
-<div id="game" class="hidden">
-    <h2>Partida</h2>
-    <p id="gameStatus"></p>
+<!-- TIENDA / PERSONAJES (125) -->
+<div id="shopPanel" class="panel oculto">
+    <h2>🛒 GALERÍA DE GUERREROS (125)</h2>
+    <div class="monedas">💰 <span id="shopCoins">0</span></div>
+    <div id="personajesGrid" class="grid-personajes"></div>
+    <button id="closeShopBtn" class="secondary-btn">◀ VOLVER</button>
 </div>
 
+<!-- PANEL CREAR SALA (elige mapa) -->
+<div id="createRoomPanel" class="panel oculto">
+    <h2>🌍 CREAR SALA</h2>
+    <select id="mapSelect" style="width:100%; padding:12px; border-radius:60px; background:#1e2a3e; color:white;">
+        <option value="bosque">🌲 BOSQUE ENCANTADO</option>
+        <option value="desierto">🏜️ DESIERTO ARDIENTE</option>
+        <option value="nieve">❄️ TUNDRA GELIDA</option>
+    </select>
+    <button id="confirmCreateRoomBtn">✨ CONTINUAR →</button>
+    <button id="cancelCreateRoomBtn" class="secondary-btn">CANCELAR</button>
 </div>
 
-<script type="module">
+<!-- LOBBY DE SALA (antes de iniciar partida) -->
+<div id="roomLobbyPanel" class="panel oculto">
+    <h2>🏠 SALA DE ESPERA</h2>
+    <div class="sala-info">
+        <p>🔑 CÓDIGO: <strong id="roomCodeDisplay">XXXXXX</strong></p>
+        <p>🗺️ MAPA: <span id="roomMapName"></span></p>
+        <p>👥 JUGADORES (<span id="playersCount">1</span>/8)</p>
+        <ul id="playersList" style="margin-top:12px; list-style:none;"></ul>
+        <button id="startGameBtn" class="secondary-btn" style="background:#e67e22;">🚀 INICIAR PARTIDA (Mín 2)</button>
+        <button id="leaveRoomBtn" class="secondary-btn" style="margin-top:8px;">SALIR DE SALA</button>
+    </div>
+</div>
 
-// FIREBASE
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } 
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+<!-- CONTENEDOR DEL JUEGO (canvas) -->
+<div id="gamePanel" class="game-container oculto">
+    <canvas id="gameCanvas" width="1000" height="650" style="width:100%; height:auto; max-width:1000px; background:#1a2a32;"></canvas>
+    <div style="display: flex; justify-content: space-between; margin-top: 12px;">
+        <div>❤️ Salud: <span id="gameHealth">100</span></div>
+        <div>🎯 Eliminaciones: <span id="gameKills">0</span></div>
+        <button id="exitGameBtn" style="width:auto; padding:8px 20px;">✖️ Rendirse</button>
+    </div>
+    <div id="gameMessage" style="text-align:center; margin-top:10px; font-weight:bold;"></div>
+</div>
 
-const firebaseConfig = {
-apiKey: "AIzaSyD13N4-9MjTrmlPwGP7mves0Exje4v2ACw",
-authDomain: "kahoot-8529e.firebaseapp.com",
-databaseURL: "https://kahoot-8529e-default-rtdb.firebaseio.com",
-projectId: "kahoot-8529e",
-storageBucket: "kahoot-8529e.firebasestorage.app",
-messagingSenderId: "313414356056",
-appId: "1:313414356056:web:4aab4587f7df9393008e2d"
-};
+<script>
+    // ---------------------- FIREBASE ----------------------
+    const firebaseConfig = {
+        apiKey: "AIzaSyD13N4-9MjTrmlPwGP7mves0Exje4v2ACw",
+        authDomain: "kahoot-8529e.firebaseapp.com",
+        databaseURL: "https://kahoot-8529e-default-rtdb.firebaseio.com",
+        projectId: "kahoot-8529e",
+        storageBucket: "kahoot-8529e.firebasestorage.app",
+        messagingSenderId: "313414356056",
+        appId: "1:313414356056:web:4aab4587f7df9393008e2d",
+        measurementId: "G-8T4CPC1BQ3"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-const auth = getAuth(app);
+    let currentUser = null;
+    let userData = { coins: 100, ownedChars: [1], activeChar: 1 }; // inicial por defecto
+    // 125 personajes: precios dinámicos (desde 40 hasta 300)
+    const TOTAL_CHARS = 125;
+    function getCharPrice(id) { return 40 + (id % 20) * 12; }
 
-let currentUser = null;
-let coins = 0;
-let ownedCharacters = ["Character 1"];
+    // Referencias UI
+    const authPanel = document.getElementById('authPanel');
+    const lobbyPanel = document.getElementById('lobbyPanel');
+    const shopPanel = document.getElementById('shopPanel');
+    const createRoomPanel = document.getElementById('createRoomPanel');
+    const roomLobbyPanel = document.getElementById('roomLobbyPanel');
+    const gamePanel = document.getElementById('gamePanel');
 
-// LOGIN / REGISTER
-window.register = async () => {
-    const email = document.getElementById("email").value;
-    const pass = document.getElementById("password").value;
+    let activeRoomCode = null;     // sala actual
+    let isRoomCreator = false;
+    let currentGameMode = null;    // 'bots' o 'multiplayer'
+    let gameEngine = null;
+    let gameLoopId = null;
 
-    const user = await createUserWithEmailAndPassword(auth, email, pass);
-    currentUser = user.user;
-
-    await set(ref(db, "users/" + currentUser.uid), {
-        coins: 0,
-        characters: ["Character 1"]
-    });
-
-    startLobby();
-};
-
-window.login = async () => {
-    const email = document.getElementById("email").value;
-    const pass = document.getElementById("password").value;
-
-    const user = await signInWithEmailAndPassword(auth, email, pass);
-    currentUser = user.user;
-
-    const snapshot = await get(ref(db, "users/" + currentUser.uid));
-    const data = snapshot.val();
-
-    coins = data.coins;
-    ownedCharacters = data.characters;
-
-    startLobby();
-};
-
-function startLobby() {
-    document.getElementById("auth").classList.add("hidden");
-    document.getElementById("lobby").classList.remove("hidden");
-    updateCoins();
-}
-
-// COINS
-function updateCoins() {
-    document.getElementById("coins").innerText = coins;
-}
-
-// SHOP
-window.openShop = () => {
-    const shop = document.getElementById("shop");
-    shop.classList.toggle("hidden");
-    shop.innerHTML = "<h3>Tienda</h3><div class='grid' id='chars'></div>";
-
-    const grid = document.getElementById("chars");
-
-    for (let i = 1; i <= 125; i++) {
-        let price = i * 2;
-        let name = "Character " + i;
-
-        let div = document.createElement("div");
-        div.className = "character";
-        div.innerHTML = `
-            <p>${name}</p>
-            <p>${price} coins</p>
-            <button onclick="buyCharacter('${name}', ${price})">Comprar</button>
-        `;
-        grid.appendChild(div);
-    }
-};
-
-window.buyCharacter = async (name, price) => {
-    if (coins >= price && !ownedCharacters.includes(name)) {
-        coins -= price;
-        ownedCharacters.push(name);
-
-        await set(ref(db, "users/" + currentUser.uid), {
-            coins,
-            characters: ownedCharacters
-        });
-
-        updateCoins();
-        alert("Comprado!");
-    }
-};
-
-// JOIN ROOM
-window.openJoin = () => {
-    const join = document.getElementById("join");
-    join.classList.toggle("hidden");
-
-    join.innerHTML = `
-        <h3>Unirse a sala</h3>
-        <input id="roomCode" placeholder="Código">
-        <button onclick="joinRoom()">Unirse</button>
-    `;
-};
-
-window.joinRoom = async () => {
-    const code = document.getElementById("roomCode").value;
-
-    const snapshot = await get(ref(db, "rooms/" + code));
-    if (snapshot.exists()) {
-        alert("Te uniste a la sala!");
-    } else {
-        alert("Sala no existe");
-    }
-};
-
-// PLAY MENU
-window.openPlay = () => {
-    const play = document.getElementById("play");
-    play.classList.toggle("hidden");
-
-    play.innerHTML = `
-        <h3>Modo de juego</h3>
-        <button onclick="playBots()">Jugar con Bots</button>
-        <button onclick="createRoom()">Crear sala</button>
-    `;
-};
-
-// BOT GAME
-window.playBots = () => {
-    document.getElementById("lobby").classList.add("hidden");
-    document.getElementById("game").classList.remove("hidden");
-
-    let players = 10;
-
-    let interval = setInterval(() => {
-        players--;
-        document.getElementById("gameStatus").innerText = "Jugadores restantes: " + players;
-
-        if (players <= 1) {
-            clearInterval(interval);
-
-            let reward = Math.floor(Math.random() * 3);
-
-            if (reward === 0) coins += 10;
-            if (reward === 1) coins += 5;
-            if (reward === 2) coins += 2;
-
-            alert("Fin de partida! Monedas ganadas!");
-            location.reload();
+    // Helper cargar datos usuario desde RTDB
+    async function loadUserData(uid) {
+        const snapshot = await db.ref(`users/${uid}`).once('value');
+        const data = snapshot.val();
+        if(data) {
+            userData = data;
+        } else {
+            userData = { coins: 100, ownedChars: [1], activeChar: 1 };
+            await db.ref(`users/${uid}`).set(userData);
         }
-    }, 1000);
-};
+        updateUIMonets();
+        if(document.getElementById('shopCoins')) document.getElementById('shopCoins').innerText = userData.coins;
+        const activeName = `⚔️ #${userData.activeChar}`;
+        document.getElementById('activeCharName').innerText = activeName;
+    }
 
-// CREATE ROOM
-window.createRoom = async () => {
-    const code = Math.random().toString(36).substring(2, 8);
+    async function saveUserData() {
+        if(currentUser) await db.ref(`users/${currentUser.uid}`).update({ coins: userData.coins, ownedChars: userData.ownedChars, activeChar: userData.activeChar });
+    }
 
-    await set(ref(db, "rooms/" + code), {
-        players: [currentUser.uid],
-        map: "default"
+    function updateUIMonets() {
+        document.getElementById('userCoins').innerText = userData.coins;
+        if(document.getElementById('shopCoins')) document.getElementById('shopCoins').innerText = userData.coins;
+    }
+
+    // Logout
+    document.getElementById('logoutBtn')?.addEventListener('click', () => { auth.signOut(); location.reload(); });
+
+    // Autenticación
+    document.getElementById('loginBtn').onclick = async () => {
+        const email = document.getElementById('loginEmail').value;
+        const pass = document.getElementById('loginPass').value;
+        try {
+            await auth.signInWithEmailAndPassword(email, pass);
+        } catch(e) { alert("Error: "+e.message); }
+    };
+    document.getElementById('registerBtn').onclick = async () => {
+        const email = document.getElementById('loginEmail').value;
+        const pass = document.getElementById('loginPass').value;
+        try {
+            await auth.createUserWithEmailAndPassword(email, pass);
+        } catch(e) { alert("Error: "+e.message); }
+    };
+    auth.onAuthStateChanged(async (user) => {
+        if(user) {
+            currentUser = user;
+            document.getElementById('userEmailDisplay').innerText = user.email;
+            await loadUserData(user.uid);
+            authPanel.classList.add('oculto');
+            lobbyPanel.classList.remove('oculto');
+            if(shopPanel) shopPanel.classList.add('oculto');
+            if(roomLobbyPanel) roomLobbyPanel.classList.add('oculto');
+        } else {
+            currentUser = null;
+            authPanel.classList.remove('oculto');
+            lobbyPanel.classList.add('oculto');
+            gamePanel.classList.add('oculto');
+        }
     });
 
-    alert("Sala creada: " + code);
-};
+    // ---------------- TIENDA PERSONAJES (125) ----------------
+    function openShop() {
+        if(!currentUser) return;
+        document.getElementById('shopCoins').innerText = userData.coins;
+        const grid = document.getElementById('personajesGrid');
+        grid.innerHTML = '';
+        for(let i=1; i<=TOTAL_CHARS; i++) {
+            const owned = userData.ownedChars.includes(i);
+            const price = getCharPrice(i);
+            const div = document.createElement('div');
+            div.className = 'personaje-card';
+            if(userData.activeChar === i) div.classList.add('selected');
+            div.innerHTML = `<div class="personaje-emoji">${getCharEmoji(i)}</div>
+                             <div>#${i}</div>
+                             <div style="font-size:0.75rem;">${owned ? '✅ OWNED' : `🪙 ${price}`}</div>`;
+            if(!owned) {
+                div.style.opacity = '0.7';
+                div.onclick = async () => {
+                    if(userData.coins >= price) {
+                        userData.coins -= price;
+                        userData.ownedChars.push(i);
+                        await saveUserData();
+                        updateUIMonets();
+                        openShop(); // refresh
+                    } else alert("❌ Monedas insuficientes");
+                };
+            } else {
+                div.onclick = async () => {
+                    userData.activeChar = i;
+                    await saveUserData();
+                    document.getElementById('activeCharName').innerText = `⚔️ #${i}`;
+                    openShop();
+                };
+            }
+            grid.appendChild(div);
+        }
+        lobbyPanel.classList.add('oculto');
+        shopPanel.classList.remove('oculto');
+    }
+    function getCharEmoji(id) { const emojis = ['⚔️','🛡️','🏹','🔫','🧨','💀','🐺','🐉','🧙','🧝','🧌','👹','🤖','🦾','🧬']; return emojis[id%emojis.length]; }
+    document.getElementById('changeCharBtn').onclick = openShop;
+    document.getElementById('closeShopBtn').onclick = () => { shopPanel.classList.add('oculto'); lobbyPanel.classList.remove('oculto'); };
 
+    // -------------------- CREAR / UNIRSE A SALA --------------------
+    document.getElementById('playBtn').onclick = () => {
+        // mostrar modal elegir modo: Bots o Sala
+        const choice = confirm("🎮 ¿Jugar contra BOTS? (Aceptar = BOTS | Cancelar = CREAR SALA)");
+        if(choice) {
+            startBotsMatch();
+        } else {
+            createRoomPanel.classList.remove('oculto');
+            lobbyPanel.classList.add('oculto');
+        }
+    };
+    document.getElementById('confirmCreateRoomBtn').onclick = async () => {
+        const mapa = document.getElementById('mapSelect').value;
+        let mapName = "Bosque";
+        if(mapa === 'desierto') mapName = "Desierto";
+        if(mapa === 'nieve') mapName = "Tundra";
+        const roomCode = generateRoomCode(10);
+        const roomRef = db.ref(`salas/${roomCode}`);
+        await roomRef.set({
+            creator: currentUser.uid,
+            mapa: mapa,
+            mapName: mapName,
+            estado: 'waiting',
+            jugadores: { [currentUser.uid]: { displayName: currentUser.email.split('@')[0], health: 100, alive: true, char: userData.activeChar } },
+            createdAt: Date.now()
+        });
+        activeRoomCode = roomCode;
+        isRoomCreator = true;
+        joinRoomLobby(roomCode, true);
+        createRoomPanel.classList.add('oculto');
+    };
+    document.getElementById('cancelCreateRoomBtn').onclick = () => { createRoomPanel.classList.add('oculto'); lobbyPanel.classList.remove('oculto'); };
+    document.getElementById('joinRoomBtn').onclick = () => {
+        let code = prompt("🔑 Introduce el código de sala:");
+        if(code && code.trim()) joinExistingRoom(code.trim());
+    };
+    async function joinExistingRoom(code) {
+        const snap = await db.ref(`salas/${code}`).once('value');
+        if(!snap.exists()) { alert("Sala no encontrada"); return; }
+        const room = snap.val();
+        if(room.estado !== 'waiting') { alert("Partida ya iniciada"); return; }
+        activeRoomCode = code;
+        isRoomCreator = false;
+        await db.ref(`salas/${code}/jugadores/${currentUser.uid}`).set({ displayName: currentUser.email.split('@')[0], health: 100, alive: true, char: userData.activeChar });
+        joinRoomLobby(code, false);
+    }
+    function joinRoomLobby(code, isCreator) {
+        lobbyPanel.classList.add('oculto');
+        roomLobbyPanel.classList.remove('oculto');
+        document.getElementById('roomCodeDisplay').innerText = code;
+        // listener cambios sala
+        const roomRef = db.ref(`salas/${code}`);
+        roomRef.on('value', (snap) => {
+            const room = snap.val();
+            if(!room) { leaveRoom(); return; }
+            document.getElementById('roomMapName').innerText = room.mapName || "Mapa";
+            const players = room.jugadores || {};
+            const count = Object.keys(players).length;
+            document.getElementById('playersCount').innerText = count;
+            const listDiv = document.getElementById('playersList');
+            listDiv.innerHTML = '';
+            for(let id in players) {
+                const li = document.createElement('li');
+                li.innerText = `👤 ${players[id].displayName} ${players[id].alive ? '❤️' : '💀'}`;
+                listDiv.appendChild(li);
+            }
+            const startBtn = document.getElementById('startGameBtn');
+            if(isCreator && room.estado === 'waiting') startBtn.disabled = (count < 2);
+            else startBtn.disabled = true;
+            if(room.estado === 'playing') {
+                // Iniciar partida multijugador automáticamente
+                startMultiplayerGame(code, room.mapa, players);
+            }
+        });
+        document.getElementById('startGameBtn').onclick = async () => {
+            if(!isCreator) return;
+            const snap = await db.ref(`salas/${code}`).once('value');
+            const room = snap.val();
+            if(Object.keys(room.jugadores).length < 2) { alert("Mínimo 2 jugadores para empezar"); return; }
+            await db.ref(`salas/${code}/estado`).set('playing');
+        };
+        document.getElementById('leaveRoomBtn').onclick = () => leaveRoom();
+    }
+    async function leaveRoom() {
+        if(activeRoomCode) {
+            const roomRef = db.ref(`salas/${activeRoomCode}`);
+            if(isRoomCreator) await roomRef.remove();
+            else await roomRef.child(`jugadores/${currentUser.uid}`).remove();
+        }
+        activeRoomCode = null;
+        roomLobbyPanel.classList.add('oculto');
+        lobbyPanel.classList.remove('oculto');
+        db.ref(`salas/${activeRoomCode}`).off();
+    }
+    function generateRoomCode(len) { return Math.random().toString(36).substring(2,2+len).toUpperCase() + Math.floor(Math.random()*999); }
+
+    // -------------------- MODO BOTS (10 Bots, último en pie) --------------------
+    class GameEngine {
+        constructor(canvas, mode, roomData = null) {
+            this.canvas = canvas;
+            this.ctx = canvas.getContext('2d');
+            this.mode = mode; // 'bots' or 'multi'
+            this.roomCode = roomData?.code;
+            this.playersMap = roomData?.players || {};
+            this.localPlayerId = currentUser.uid;
+            this.width = canvas.width;
+            this.height = canvas.height;
+            this.local = { x: this.width/2, y: this.height/2, health: 100, angle: 0, kills: 0, alive: true, char: userData.activeChar };
+            this.bullets = [];
+            this.enemies = []; // solo para bots
+            this.playersList = []; // multi: otros jugadores
+            this.gameOver = false;
+            this.result = null;
+            this.lastShoot = 0;
+            this.keys = { w: false, s: false, a: false, d: false };
+            this.mouseX = this.width/2, this.mouseY = this.height/2;
+            this.frame = 0;
+            this.initListeners();
+            if(mode === 'bots') this.initBots();
+            if(mode === 'multi') this.initMultiplayerSync();
+        }
+        initBots() {
+            for(let i=0;i<10;i++) {
+                this.enemies.push({ x: Math.random()*this.width, y: Math.random()*this.height, health: 50, size: 16, shootCooldown: 0, id: i });
+            }
+        }
+        initMultiplayerSync() {
+            // suscribirse a jugadores en sala
+            const roomRef = db.ref(`salas/${this.roomCode}/jugadores`);
+            roomRef.on('value', (snap) => {
+                const data = snap.val() || {};
+                this.playersList = [];
+                for(let uid in data) {
+                    if(uid === this.localPlayerId) continue;
+                    const p = data[uid];
+                    if(p.alive && p.health > 0) {
+                        this.playersList.push({ uid, x: p.x || 50, y: p.y || 50, health: p.health, displayName: p.displayName, char: p.char });
+                    }
+                }
+            });
+            // enviar posición cada 2 frames
+            this.posInterval = setInterval(() => {
+                if(!this.gameOver && this.local.alive) {
+                    db.ref(`salas/${this.roomCode}/jugadores/${this.localPlayerId}`).update({ x: this.local.x, y: this.local.y, health: this.local.health, alive: true, char: userData.activeChar });
+                }
+            }, 50);
+        }
+        handleDamage(targetUid, damage) {
+            if(this.mode === 'multi' && targetUid !== this.localPlayerId) {
+                db.ref(`salas/${this.roomCode}/jugadores/${targetUid}/health`).transaction(h => (h||100)-damage);
+            }
+        }
+        shoot(angle) {
+            this.bullets.push({ x: this.local.x, y: this.local.y, vx: Math.cos(angle)*12, vy: Math.sin(angle)*12, life: 80, size: 5, owner: 'local' });
+        }
+        update() {
+            if(this.gameOver) return;
+            // movimiento
+            let spd = 5;
+            if(this.keys.w) this.local.y -= spd;
+            if(this.keys.s) this.local.y += spd;
+            if(this.keys.a) this.local.x -= spd;
+            if(this.keys.d) this.local.x += spd;
+            this.local.x = Math.min(Math.max(20, this.local.x), this.width-20);
+            this.local.y = Math.min(Math.max(20, this.local.y), this.height-20);
+            const dx = this.mouseX - this.local.x;
+            const dy = this.mouseY - this.local.y;
+            this.local.angle = Math.atan2(dy, dx);
+            if(Date.now() - this.lastShoot > 220) { this.shoot(this.local.angle); this.lastShoot = Date.now(); }
+            // balas
+            for(let i=0;i<this.bullets.length;i++) {
+                let b = this.bullets[i];
+                b.x += b.vx; b.y += b.vy;
+                b.life--;
+                if(b.x<0||b.x>this.width||b.y<0||b.y>this.height||b.life<=0) { this.bullets.splice(i,1); i--; continue; }
+                // colisiones
+                if(this.mode === 'bots') {
+                    for(let j=0;j<this.enemies.length;j++) {
+                        let e = this.enemies[j];
+                        if(e.health>0 && Math.hypot(b.x-e.x, b.y-e.y)<20) {
+                            e.health -= 34;
+                            this.bullets.splice(i,1); i--;
+                            if(e.health<=0) { this.enemies.splice(j,1); this.local.kills++; document.getElementById('gameKills').innerText=this.local.kills; }
+                            break;
+                        }
+                    }
+                } else if(this.mode === 'multi') {
+                    for(let p of this.playersList) {
+                        if(p.health>0 && Math.hypot(b.x-p.x, b.y-p.y)<24) {
+                            this.handleDamage(p.uid, 30);
+                            this.bullets.splice(i,1); i--;
+                            break;
+                        }
+                    }
+                }
+            }
+            if(this.mode === 'bots') {
+                for(let e of this.enemies) {
+                    let ang = Math.atan2(this.local.y - e.y, this.local.x - e.x);
+                    e.x += Math.cos(ang)*2.2;
+                    e.y += Math.sin(ang)*2.2;
+                    e.shootCooldown--;
+                    if(e.shootCooldown<=0 && Math.hypot(this.local.x-e.x, this.local.y-e.y)<300) {
+                        let bulletAng = Math.atan2(this.local.y - e.y, this.local.x - e.x);
+                        this.bullets.push({ x:e.x, y:e.y, vx:Math.cos(bulletAng)*8, vy:Math.sin(bulletAng)*8, life:60, size:4, owner:'bot' });
+                        e.shootCooldown=45;
+                    }
+                }
+                // colisiones balas enemigas con jugador
+                for(let i=0;i<this.bullets.length;i++) {
+                    let b = this.bullets[i];
+                    if(b.owner === 'bot' && Math.hypot(b.x-this.local.x, b.y-this.local.y)<22) {
+                        this.local.health -= 18;
+                        this.bullets.splice(i,1);
+                        if(this.local.health<=0) this.gameOver=true;
+                        break;
+                    }
+                }
+                if(this.enemies.length===0 && !this.gameOver) this.gameOver=true, this.result='win';
+                if(this.local.health<=0) this.gameOver=true, this.result='lose';
+            } else { // multi: verificar muerte local
+                const snapPlayer = db.ref(`salas/${this.roomCode}/jugadores/${this.localPlayerId}`);
+                snapPlayer.once('value', (s)=> { if(s.val()?.health<=0) this.gameOver=true; });
+            }
+            if(this.gameOver) this.endMatch();
+        }
+        async endMatch() {
+            if(this.mode === 'bots') {
+                let reward = 0;
+                if(this.result==='win' && this.enemies.length===0) reward=10;
+                else if(this.enemies.length===1) reward=5;
+                else if(this.enemies.length===2) reward=2;
+                if(reward>0) { userData.coins += reward; await saveUserData(); updateUIMonets(); alert(`🎉 Partida finalizada! +${reward} monedas.`); }
+                else alert("💀 Has muerto. Sigue entrenando.");
+            } else if(this.mode === 'multi') {
+                alert("🏁 Partida multijugador finalizada.");
+                await db.ref(`salas/${this.roomCode}`).remove();
+            }
+            if(this.posInterval) clearInterval(this.posInterval);
+            if(gameLoopId) cancelAnimationFrame(gameLoopId);
+            gamePanel.classList.add('oculto');
+            lobbyPanel.classList.remove('oculto');
+            if(activeRoomCode) leaveRoom();
+            gameEngine = null;
+        }
+        draw() {
+            this.ctx.clearRect(0,0,this.width,this.height);
+            this.ctx.fillStyle = '#1f3a2f';
+            this.ctx.fillRect(0,0,this.width,this.height);
+            this.ctx.fillStyle = '#5a8f4c';
+            for(let i=0;i<200;i++) this.ctx.fillRect(Math.random()*this.width, Math.random()*this.height,3,3);
+            // dibujar jugadores (multi)
+            if(this.mode === 'multi') {
+                for(let p of this.playersList) {
+                    this.ctx.fillStyle = '#e67e22';
+                    this.ctx.beginPath(); this.ctx.arc(p.x, p.y, 18,0,Math.PI*2); this.ctx.fill();
+                    this.ctx.fillStyle = 'white'; this.ctx.font='bold 12px monospace'; this.ctx.fillText(p.displayName,p.x-20,p.y-18);
+                    this.ctx.fillStyle = 'red'; this.ctx.fillRect(p.x-20,p.y+15,40*(p.health/100),6);
+                }
+            }
+            // enemigos bots
+            for(let e of this.enemies) {
+                this.ctx.fillStyle = '#c0392b';
+                this.ctx.beginPath(); this.ctx.arc(e.x, e.y, 16,0,Math.PI*2); this.ctx.fill();
+                this.ctx.fillStyle = 'white'; this.ctx.fillText('BOT',e.x-12,e.y-12);
+            }
+            // jugador local
+            const grad = this.ctx.createLinearGradient(this.local.x-10, this.local.y-10, this.local.x+10, this.local.y+10);
+            grad.addColorStop(0,'#f1c40f');
+            grad.addColorStop(1,'#e67e22');
+            this.ctx.fillStyle = grad;
+            this.ctx.beginPath(); this.ctx.arc(this.local.x, this.local.y, 20,0,Math.PI*2); this.ctx.fill();
+            this.ctx.fillStyle = 'white';
+            this.ctx.font = 'bold 14px sans-serif';
+            this.ctx.fillText(`👤 ${currentUser.email.split('@')[0]}`, this.local.x-30, this.local.y-25);
+            this.ctx.fillStyle = 'red'; this.ctx.fillRect(this.local.x-25, this.local.y+22, 50*(this.local.health/100), 6);
+            // arma / linea dirección
+            this.ctx.beginPath(); this.ctx.moveTo(this.local.x, this.local.y); this.ctx.lineTo(this.local.x+Math.cos(this.local.angle)*30, this.local.y+Math.sin(this.local.angle)*30); this.ctx.strokeStyle='white'; this.ctx.lineWidth=3; this.ctx.stroke();
+            for(let b of this.bullets) { this.ctx.fillStyle = 'orange'; this.ctx.beginPath(); this.ctx.arc(b.x,b.y,5,0,Math.PI*2); this.ctx.fill(); }
+            document.getElementById('gameHealth').innerText = Math.max(0,this.local.health);
+        }
+        initListeners() {
+            window.addEventListener('keydown', (e) => { if(e.key === 'w') this.keys.w=true; if(e.key === 's') this.keys.s=true; if(e.key === 'a') this.keys.a=true; if(e.key === 'd') this.keys.d=true; });
+            window.addEventListener('keyup', (e) => { if(e.key === 'w') this.keys.w=false; if(e.key === 's') this.keys.s=false; if(e.key === 'a') this.keys.a=false; if(e.key === 'd') this.keys.d=false; });
+            this.canvas.addEventListener('mousemove', (e) => { const rect = this.canvas.getBoundingClientRect(); const scaleX = this.canvas.width/rect.width; this.mouseX = (e.clientX - rect.left)*scaleX; this.mouseY = (e.clientY - rect.top)*scaleX; });
+        }
+        startLoop() { const updateLoop = () => { this.update(); this.draw(); gameLoopId = requestAnimationFrame(updateLoop); }; updateLoop(); }
+    }
+
+    async function startBotsMatch() {
+        lobbyPanel.classList.add('oculto');
+        gamePanel.classList.remove('oculto');
+        const canvas = document.getElementById('gameCanvas');
+        gameEngine = new GameEngine(canvas, 'bots');
+        gameEngine.startLoop();
+        document.getElementById('exitGameBtn').onclick = () => { if(gameEngine) gameEngine.gameOver=true; };
+    }
+    async function startMultiplayerGame(roomCode, mapa, playersObj) {
+        lobbyPanel.classList.add('oculto');
+        roomLobbyPanel.classList.add('oculto');
+        gamePanel.classList.remove('oculto');
+        const canvas = document.getElementById('gameCanvas');
+        gameEngine = new GameEngine(canvas, 'multi', { code: roomCode, players: playersObj });
+        gameEngine.startLoop();
+        document.getElementById('exitGameBtn').onclick = () => { if(gameEngine) gameEngine.gameOver=true; };
+    }
+    // Funcion aux
+    window.startBotsMatch = startBotsMatch;
 </script>
-
 </body>
 </html>

@@ -2,8 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>SURVIVAL ARENA - Juego estilo Survev</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>⚡ SURVIVAL ARENA — Battle Royale .io</title>
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
@@ -14,29 +14,30 @@
             padding: 0;
             box-sizing: border-box;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            background: linear-gradient(145deg, #0a0f1e 0%, #0c1222 100%);
+            background: radial-gradient(circle at 20% 30%, #0a0f1e, #03060c);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-family: 'Poppins', 'Segoe UI', system-ui, -apple-system, sans-serif;
-            padding: 20px;
+            font-family: 'Segoe UI', 'Poppins', system-ui, -apple-system, sans-serif;
+            padding: 16px;
         }
 
-        /* Contenedor principal de paneles */
+        /* Paneles principales */
         .panel {
-            background: rgba(18, 25, 45, 0.85);
-            backdrop-filter: blur(12px);
-            border-radius: 48px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.1);
-            padding: 30px;
+            background: rgba(12, 20, 30, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: 2rem;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            box-shadow: 0 25px 40px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1);
+            padding: 1.8rem;
             width: 100%;
-            max-width: 500px;
-            transition: all 0.3s ease;
+            max-width: 550px;
+            transition: all 0.2s ease;
             color: #f0f3fa;
         }
 
@@ -52,25 +53,28 @@
         canvas {
             display: block;
             margin: 0 auto;
-            border-radius: 28px;
-            box-shadow: 0 20px 35px rgba(0,0,0,0.5), 0 0 0 2px rgba(255,215,0,0.2);
+            border-radius: 2rem;
+            box-shadow: 0 20px 30px rgba(0,0,0,0.6), 0 0 0 2px #ffd96680;
             cursor: crosshair;
+            width: 100%;
+            height: auto;
+            background: #1e2a2a;
         }
 
         h2 {
-            font-size: 2rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #FFD966, #FFA500);
+            font-size: 1.9rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FFE6A3, #FFA500);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            margin-bottom: 20px;
             text-align: center;
+            margin-bottom: 1rem;
         }
 
         input, button {
             width: 100%;
-            padding: 14px 18px;
+            padding: 12px 18px;
             margin: 8px 0;
             border-radius: 60px;
             border: none;
@@ -80,23 +84,20 @@
         }
 
         input {
-            background: #1e2a3e;
+            background: #1e2a3a;
             color: white;
-            border: 1px solid #3a4a62;
+            border: 1px solid #4a627a;
         }
 
         button {
-            background: linear-gradient(90deg, #ff8c00, #ff2e00);
+            background: linear-gradient(95deg, #ff9100, #e65c00);
             color: white;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(255, 60, 0, 0.4);
+            box-shadow: 0 5px 12px #ff5e0090;
+            font-weight: bold;
         }
 
-        button:hover {
-            transform: scale(1.02);
-            filter: brightness(1.05);
-        }
-
+        button:active { transform: scale(0.97); }
         .secondary-btn {
             background: #2c3e5c;
             box-shadow: none;
@@ -104,156 +105,151 @@
 
         .grid-personajes {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
             gap: 12px;
-            max-height: 400px;
+            max-height: 380px;
             overflow-y: auto;
-            padding: 10px;
+            padding: 8px;
             margin-top: 15px;
-            border-radius: 28px;
-            background: rgba(0,0,0,0.3);
+            border-radius: 1.5rem;
+            background: #00000040;
         }
 
         .personaje-card {
-            background: #1f2a3e;
-            border-radius: 24px;
+            background: #16212e;
+            border-radius: 1.5rem;
             padding: 10px 5px;
             text-align: center;
             cursor: pointer;
             transition: 0.1s;
-            border: 1px solid #4a627a;
+            border: 1px solid #5e7a9a;
         }
-        .personaje-card.selected {
-            border: 3px solid gold;
-            background: #2a3b55;
-        }
-        .personaje-emoji {
-            font-size: 2.5rem;
-        }
+        .personaje-card.selected { border: 3px solid gold; background: #2a3b55; transform: scale(0.98);}
+        .personaje-emoji { font-size: 2.2rem; }
         .monedas {
             font-size: 1.3rem;
-            background: #00000066;
+            background: #000000aa;
             display: inline-block;
             padding: 6px 18px;
             border-radius: 40px;
             margin-bottom: 15px;
-        }
-        .lobby-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        .badge {
-            background: #f5a623;
-            color: #1e1e2a;
-            padding: 5px 12px;
-            border-radius: 50px;
             font-weight: bold;
         }
-        .oculto {
-            display: none !important;
+        .flex-btns { display: flex; gap: 12px; margin: 15px 0; flex-wrap: wrap; }
+        .sala-info { background: #00000055; border-radius: 1.5rem; padding: 15px; margin-top: 15px; }
+        .oculto { display: none !important; }
+        #playersList { list-style: none; max-height: 150px; overflow-y: auto; }
+        #playersList li { background: #1e2e44; margin: 5px 0; padding: 6px 12px; border-radius: 40px; }
+
+        /* Joystick móvil */
+        .joystick-area {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 130px;
+            height: 130px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 100%;
+            backdrop-filter: blur(8px);
+            border: 2px solid #ffaa33;
+            touch-action: none;
+            z-index: 200;
         }
-        .flex-btns {
-            display: flex;
-            gap: 12px;
-            margin: 15px 0;
+        .joystick-base {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: #ffaa33cc;
+            border-radius: 100%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: 0.02s linear;
         }
-        .sala-info {
-            background: #00000055;
-            border-radius: 28px;
-            padding: 15px;
-            margin-top: 15px;
-        }
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #1e2a36;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #ff8c00;
-            border-radius: 10px;
-        }
+        @media (min-width: 768px) { .joystick-area { display: none; } }
     </style>
 </head>
 <body>
 
-<!-- PANEL DE AUTENTICACIÓN -->
+<!-- AUTENTICACIÓN -->
 <div id="authPanel" class="panel">
-    <h2>🔥 ARENA SURVIVAL</h2>
-    <div style="text-align:center; margin-bottom:20px;">⚔️ Battle Royale extremo ⚔️</div>
-    <input type="email" id="loginEmail" placeholder="Correo electrónico">
+    <h2>⚔️ ARENA SURVIVAL</h2>
+    <div style="text-align:center; margin-bottom:20px;">🎯 último en pie gana 🎯</div>
+    <input type="email" id="loginEmail" placeholder="Correo electrónico" autocomplete="email">
     <input type="password" id="loginPass" placeholder="Contraseña">
     <button id="loginBtn">🔐 INICIAR SESIÓN</button>
-    <button id="registerBtn" class="secondary-btn">✨ CREAR CUENTA NUEVA</button>
+    <button id="registerBtn" class="secondary-btn">✨ CREAR CUENTA</button>
 </div>
 
-<!-- LOBBY PRINCIPAL (después de login) -->
+<!-- LOBBY PRINCIPAL -->
 <div id="lobbyPanel" class="panel oculto">
-    <div class="lobby-header">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
         <h2>🏆 LOBBY</h2>
         <div class="monedas">🪙 <span id="userCoins">0</span></div>
     </div>
-    <div style="display: flex; align-items: center; gap: 12px; margin: 10px 0;">
-        <div style="background:#1e2a3a; border-radius: 60px; padding: 5px 15px;">👤 <span id="userEmailDisplay"></span></div>
-        <div>🎭 Personaje: <span id="activeCharName">#1</span></div>
+    <div style="display: flex; gap: 12px; align-items: center; margin: 10px 0;">
+        <div>👤 <span id="userEmailDisplay"></span></div>
+        <div>🎭 <span id="activeCharName">#1</span></div>
     </div>
     <div class="flex-btns">
-        <button id="changeCharBtn">🎨 CAMBIAR PERSONAJE</button>
+        <button id="changeCharBtn">🎨 PERSONAJES (125)</button>
         <button id="joinRoomBtn">🔗 UNIRSE POR CÓDIGO</button>
     </div>
     <button id="playBtn" style="background: #2ecc71;">▶️ JUGAR</button>
-    <button id="logoutBtn" class="secondary-btn" style="margin-top: 12px;">🚪 CERRAR SESIÓN</button>
+    <button id="logoutBtn" class="secondary-btn">🚪 CERRAR SESIÓN</button>
 </div>
 
-<!-- TIENDA / PERSONAJES (125) -->
+<!-- TIENDA / 125 PERSONAJES -->
 <div id="shopPanel" class="panel oculto">
-    <h2>🛒 GALERÍA DE GUERREROS (125)</h2>
+    <h2>🛡️ GUERREROS ÉPICOS</h2>
     <div class="monedas">💰 <span id="shopCoins">0</span></div>
     <div id="personajesGrid" class="grid-personajes"></div>
     <button id="closeShopBtn" class="secondary-btn">◀ VOLVER</button>
 </div>
 
-<!-- PANEL CREAR SALA (elige mapa) -->
+<!-- CREAR SALA (elegir mapa) -->
 <div id="createRoomPanel" class="panel oculto">
-    <h2>🌍 CREAR SALA</h2>
+    <h2>🌍 NUEVA SALA</h2>
     <select id="mapSelect" style="width:100%; padding:12px; border-radius:60px; background:#1e2a3e; color:white;">
-        <option value="bosque">🌲 BOSQUE ENCANTADO</option>
-        <option value="desierto">🏜️ DESIERTO ARDIENTE</option>
-        <option value="nieve">❄️ TUNDRA GELIDA</option>
+        <option value="bosque">🌲 BOSQUE MÍSTICO</option>
+        <option value="desierto">🏜️ DUNAS ARDIENTES</option>
+        <option value="nieve">❄️ PICO GLACIAL</option>
     </select>
-    <button id="confirmCreateRoomBtn">✨ CONTINUAR →</button>
+    <button id="confirmCreateRoomBtn">✨ CREAR SALA →</button>
     <button id="cancelCreateRoomBtn" class="secondary-btn">CANCELAR</button>
 </div>
 
-<!-- LOBBY DE SALA (antes de iniciar partida) -->
+<!-- LOBBY DE SALA (espera) -->
 <div id="roomLobbyPanel" class="panel oculto">
-    <h2>🏠 SALA DE ESPERA</h2>
+    <h2>🏠 SALA DE GUERRA</h2>
     <div class="sala-info">
         <p>🔑 CÓDIGO: <strong id="roomCodeDisplay">XXXXXX</strong></p>
         <p>🗺️ MAPA: <span id="roomMapName"></span></p>
-        <p>👥 JUGADORES (<span id="playersCount">1</span>/8)</p>
-        <ul id="playersList" style="margin-top:12px; list-style:none;"></ul>
-        <button id="startGameBtn" class="secondary-btn" style="background:#e67e22;">🚀 INICIAR PARTIDA (Mín 2)</button>
-        <button id="leaveRoomBtn" class="secondary-btn" style="margin-top:8px;">SALIR DE SALA</button>
+        <p>👥 JUGADORES: <span id="playersCount">1</span>/10</p>
+        <ul id="playersList"></ul>
+        <button id="startGameBtn" style="background:#e67e22;">🚀 INICIAR (mín 2)</button>
+        <button id="leaveRoomBtn" class="secondary-btn">SALIR</button>
     </div>
 </div>
 
-<!-- CONTENEDOR DEL JUEGO (canvas) -->
+<!-- JUEGO (canvas) -->
 <div id="gamePanel" class="game-container oculto">
-    <canvas id="gameCanvas" width="1000" height="650" style="width:100%; height:auto; max-width:1000px; background:#1a2a32;"></canvas>
-    <div style="display: flex; justify-content: space-between; margin-top: 12px;">
-        <div>❤️ Salud: <span id="gameHealth">100</span></div>
-        <div>🎯 Eliminaciones: <span id="gameKills">0</span></div>
-        <button id="exitGameBtn" style="width:auto; padding:8px 20px;">✖️ Rendirse</button>
+    <canvas id="gameCanvas" width="1100" height="700" style="width:100%; height:auto; max-width:1100px; background:#1f3a2f;"></canvas>
+    <div style="display: flex; justify-content: space-between; margin-top: 12px; gap: 12px; flex-wrap: wrap;">
+        <div>❤️ <span id="gameHealth">100</span>%</div>
+        <div>💀 Eliminaciones: <span id="gameKills">0</span></div>
+        <button id="exitGameBtn" style="width:auto; padding:8px 24px;">🏳️ RENDIRSE</button>
     </div>
-    <div id="gameMessage" style="text-align:center; margin-top:10px; font-weight:bold;"></div>
+    <div id="gameMessage" style="text-align:center; margin-top:8px; font-weight:bold;"></div>
+</div>
+
+<!-- Joystick táctil (móvil) -->
+<div id="joystickContainer" class="joystick-area oculto">
+    <div id="joystickBase" class="joystick-base"></div>
 </div>
 
 <script>
-    // ---------------------- FIREBASE ----------------------
+    // ---------- FIREBASE ----------
     const firebaseConfig = {
         apiKey: "AIzaSyD13N4-9MjTrmlPwGP7mves0Exje4v2ACw",
         authDomain: "kahoot-8529e.firebaseapp.com",
@@ -269,436 +265,399 @@
     const db = firebase.database();
 
     let currentUser = null;
-    let userData = { coins: 100, ownedChars: [1], activeChar: 1 }; // inicial por defecto
-    // 125 personajes: precios dinámicos (desde 40 hasta 300)
+    let userData = { coins: 100, ownedChars: [1], activeChar: 1 };
     const TOTAL_CHARS = 125;
-    function getCharPrice(id) { return 40 + (id % 20) * 12; }
+    function getCharPrice(id) { return 30 + (id % 18) * 10; }  // precios variados
+    function getCharEmoji(id) { const list = ['⚔️','🛡️','🏹','🔫','🧨','💀','🐺','🐉','🧙','🧝','🤖','🦾','👹','🧬','🔥','💧','🌪️']; return list[id % list.length]; }
 
-    // Referencias UI
+    // UI elements
     const authPanel = document.getElementById('authPanel');
     const lobbyPanel = document.getElementById('lobbyPanel');
     const shopPanel = document.getElementById('shopPanel');
     const createRoomPanel = document.getElementById('createRoomPanel');
     const roomLobbyPanel = document.getElementById('roomLobbyPanel');
     const gamePanel = document.getElementById('gamePanel');
+    const joystickDiv = document.getElementById('joystickContainer');
 
-    let activeRoomCode = null;     // sala actual
+    let activeRoomCode = null;
     let isRoomCreator = false;
-    let currentGameMode = null;    // 'bots' o 'multiplayer'
-    let gameEngine = null;
+    let currentGame = null;      // instancia Game
     let gameLoopId = null;
 
-    // Helper cargar datos usuario desde RTDB
+    // Helper user data
     async function loadUserData(uid) {
-        const snapshot = await db.ref(`users/${uid}`).once('value');
-        const data = snapshot.val();
-        if(data) {
-            userData = data;
-        } else {
-            userData = { coins: 100, ownedChars: [1], activeChar: 1 };
-            await db.ref(`users/${uid}`).set(userData);
-        }
-        updateUIMonets();
-        if(document.getElementById('shopCoins')) document.getElementById('shopCoins').innerText = userData.coins;
-        const activeName = `⚔️ #${userData.activeChar}`;
-        document.getElementById('activeCharName').innerText = activeName;
+        const snap = await db.ref(`users/${uid}`).once('value');
+        const data = snap.val();
+        if(data) userData = data;
+        else { userData = { coins: 100, ownedChars: [1], activeChar: 1 }; await db.ref(`users/${uid}`).set(userData); }
+        updateUI();
     }
-
-    async function saveUserData() {
-        if(currentUser) await db.ref(`users/${currentUser.uid}`).update({ coins: userData.coins, ownedChars: userData.ownedChars, activeChar: userData.activeChar });
-    }
-
-    function updateUIMonets() {
+    async function saveUser() { if(currentUser) await db.ref(`users/${currentUser.uid}`).update(userData); }
+    function updateUI() {
         document.getElementById('userCoins').innerText = userData.coins;
         if(document.getElementById('shopCoins')) document.getElementById('shopCoins').innerText = userData.coins;
+        document.getElementById('activeCharName').innerHTML = `#${userData.activeChar} ${getCharEmoji(userData.activeChar)}`;
     }
-
-    // Logout
-    document.getElementById('logoutBtn')?.addEventListener('click', () => { auth.signOut(); location.reload(); });
 
     // Autenticación
     document.getElementById('loginBtn').onclick = async () => {
         const email = document.getElementById('loginEmail').value;
         const pass = document.getElementById('loginPass').value;
-        try {
-            await auth.signInWithEmailAndPassword(email, pass);
-        } catch(e) { alert("Error: "+e.message); }
+        try { await auth.signInWithEmailAndPassword(email, pass); } catch(e) { alert("Error: "+e.message); }
     };
     document.getElementById('registerBtn').onclick = async () => {
         const email = document.getElementById('loginEmail').value;
         const pass = document.getElementById('loginPass').value;
-        try {
-            await auth.createUserWithEmailAndPassword(email, pass);
-        } catch(e) { alert("Error: "+e.message); }
+        try { await auth.createUserWithEmailAndPassword(email, pass); } catch(e) { alert("Error: "+e.message); }
     };
     auth.onAuthStateChanged(async (user) => {
         if(user) {
             currentUser = user;
-            document.getElementById('userEmailDisplay').innerText = user.email;
+            document.getElementById('userEmailDisplay').innerText = user.email.split('@')[0];
             await loadUserData(user.uid);
             authPanel.classList.add('oculto');
             lobbyPanel.classList.remove('oculto');
             if(shopPanel) shopPanel.classList.add('oculto');
             if(roomLobbyPanel) roomLobbyPanel.classList.add('oculto');
-        } else {
-            currentUser = null;
-            authPanel.classList.remove('oculto');
-            lobbyPanel.classList.add('oculto');
-            gamePanel.classList.add('oculto');
-        }
+            if(createRoomPanel) createRoomPanel.classList.add('oculto');
+            // Detectar móvil para joystick
+            if(/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) joystickDiv.classList.remove('oculto');
+            else joystickDiv.classList.add('oculto');
+        } else { window.location.reload(); }
     });
+    document.getElementById('logoutBtn').onclick = () => auth.signOut();
 
-    // ---------------- TIENDA PERSONAJES (125) ----------------
+    // ---------- TIENDA 125 PERSONAJES ----------
     function openShop() {
-        if(!currentUser) return;
-        document.getElementById('shopCoins').innerText = userData.coins;
         const grid = document.getElementById('personajesGrid');
         grid.innerHTML = '';
         for(let i=1; i<=TOTAL_CHARS; i++) {
             const owned = userData.ownedChars.includes(i);
             const price = getCharPrice(i);
-            const div = document.createElement('div');
-            div.className = 'personaje-card';
-            if(userData.activeChar === i) div.classList.add('selected');
-            div.innerHTML = `<div class="personaje-emoji">${getCharEmoji(i)}</div>
-                             <div>#${i}</div>
-                             <div style="font-size:0.75rem;">${owned ? '✅ OWNED' : `🪙 ${price}`}</div>`;
+            const card = document.createElement('div');
+            card.className = 'personaje-card';
+            if(userData.activeChar === i) card.classList.add('selected');
+            card.innerHTML = `<div class="personaje-emoji">${getCharEmoji(i)}</div><div>#${i}</div><div style="font-size:0.7rem;">${owned ? '✅ DUEÑO' : `🪙 ${price}`}</div>`;
             if(!owned) {
-                div.style.opacity = '0.7';
-                div.onclick = async () => {
+                card.onclick = async () => {
                     if(userData.coins >= price) {
                         userData.coins -= price;
                         userData.ownedChars.push(i);
-                        await saveUserData();
-                        updateUIMonets();
-                        openShop(); // refresh
+                        await saveUser();
+                        updateUI();
+                        openShop();
                     } else alert("❌ Monedas insuficientes");
                 };
             } else {
-                div.onclick = async () => {
+                card.onclick = async () => {
                     userData.activeChar = i;
-                    await saveUserData();
-                    document.getElementById('activeCharName').innerText = `⚔️ #${i}`;
+                    await saveUser();
+                    updateUI();
                     openShop();
                 };
             }
-            grid.appendChild(div);
+            grid.appendChild(card);
         }
         lobbyPanel.classList.add('oculto');
         shopPanel.classList.remove('oculto');
+        document.getElementById('shopCoins').innerText = userData.coins;
     }
-    function getCharEmoji(id) { const emojis = ['⚔️','🛡️','🏹','🔫','🧨','💀','🐺','🐉','🧙','🧝','🧌','👹','🤖','🦾','🧬']; return emojis[id%emojis.length]; }
     document.getElementById('changeCharBtn').onclick = openShop;
     document.getElementById('closeShopBtn').onclick = () => { shopPanel.classList.add('oculto'); lobbyPanel.classList.remove('oculto'); };
 
-    // -------------------- CREAR / UNIRSE A SALA --------------------
+    // ---------- MODOS DE JUEGO ----------
     document.getElementById('playBtn').onclick = () => {
-        // mostrar modal elegir modo: Bots o Sala
-        const choice = confirm("🎮 ¿Jugar contra BOTS? (Aceptar = BOTS | Cancelar = CREAR SALA)");
-        if(choice) {
-            startBotsMatch();
-        } else {
-            createRoomPanel.classList.remove('oculto');
-            lobbyPanel.classList.add('oculto');
-        }
+        const op = confirm("🎮 ¿JUGAR CONTRA BOTS? (Aceptar = BOTS | Cancelar = SALA MULTIJUGADOR)");
+        if(op) startBotsMatch();
+        else { createRoomPanel.classList.remove('oculto'); lobbyPanel.classList.add('oculto'); }
     };
     document.getElementById('confirmCreateRoomBtn').onclick = async () => {
         const mapa = document.getElementById('mapSelect').value;
-        let mapName = "Bosque";
-        if(mapa === 'desierto') mapName = "Desierto";
-        if(mapa === 'nieve') mapName = "Tundra";
-        const roomCode = generateRoomCode(10);
+        let mapName = mapa === 'bosque' ? 'Bosque' : (mapa === 'desierto' ? 'Desierto' : 'Tundra');
+        const roomCode = Math.random().toString(36).substring(2,8).toUpperCase() + Math.floor(Math.random()*1000);
         const roomRef = db.ref(`salas/${roomCode}`);
         await roomRef.set({
             creator: currentUser.uid,
             mapa: mapa,
             mapName: mapName,
             estado: 'waiting',
-            jugadores: { [currentUser.uid]: { displayName: currentUser.email.split('@')[0], health: 100, alive: true, char: userData.activeChar } },
+            jugadores: { [currentUser.uid]: { displayName: currentUser.email.split('@')[0], health: 100, alive: true, char: userData.activeChar, x: 400, y: 400 } },
             createdAt: Date.now()
         });
         activeRoomCode = roomCode;
         isRoomCreator = true;
-        joinRoomLobby(roomCode, true);
+        joinRoomLobby(roomCode);
         createRoomPanel.classList.add('oculto');
     };
     document.getElementById('cancelCreateRoomBtn').onclick = () => { createRoomPanel.classList.add('oculto'); lobbyPanel.classList.remove('oculto'); };
     document.getElementById('joinRoomBtn').onclick = () => {
-        let code = prompt("🔑 Introduce el código de sala:");
-        if(code && code.trim()) joinExistingRoom(code.trim());
+        let code = prompt("🔑 CÓDIGO DE SALA:");
+        if(code) joinExistingRoom(code.trim());
     };
     async function joinExistingRoom(code) {
         const snap = await db.ref(`salas/${code}`).once('value');
-        if(!snap.exists()) { alert("Sala no encontrada"); return; }
+        if(!snap.exists()) { alert("Sala no existe"); return; }
         const room = snap.val();
-        if(room.estado !== 'waiting') { alert("Partida ya iniciada"); return; }
+        if(room.estado !== 'waiting') { alert("Partida en curso"); return; }
         activeRoomCode = code;
         isRoomCreator = false;
-        await db.ref(`salas/${code}/jugadores/${currentUser.uid}`).set({ displayName: currentUser.email.split('@')[0], health: 100, alive: true, char: userData.activeChar });
-        joinRoomLobby(code, false);
+        await db.ref(`salas/${code}/jugadores/${currentUser.uid}`).set({ displayName: currentUser.email.split('@')[0], health: 100, alive: true, char: userData.activeChar, x: 300, y: 300 });
+        joinRoomLobby(code);
     }
-    function joinRoomLobby(code, isCreator) {
+    function joinRoomLobby(code) {
         lobbyPanel.classList.add('oculto');
         roomLobbyPanel.classList.remove('oculto');
-        document.getElementById('roomCodeDisplay').innerText = code;
-        // listener cambios sala
         const roomRef = db.ref(`salas/${code}`);
         roomRef.on('value', (snap) => {
             const room = snap.val();
-            if(!room) { leaveRoom(); return; }
-            document.getElementById('roomMapName').innerText = room.mapName || "Mapa";
+            if(!room) return;
+            document.getElementById('roomCodeDisplay').innerText = code;
+            document.getElementById('roomMapName').innerText = room.mapName;
             const players = room.jugadores || {};
             const count = Object.keys(players).length;
             document.getElementById('playersCount').innerText = count;
-            const listDiv = document.getElementById('playersList');
-            listDiv.innerHTML = '';
-            for(let id in players) {
-                const li = document.createElement('li');
-                li.innerText = `👤 ${players[id].displayName} ${players[id].alive ? '❤️' : '💀'}`;
-                listDiv.appendChild(li);
-            }
-            const startBtn = document.getElementById('startGameBtn');
-            if(isCreator && room.estado === 'waiting') startBtn.disabled = (count < 2);
-            else startBtn.disabled = true;
-            if(room.estado === 'playing') {
-                // Iniciar partida multijugador automáticamente
-                startMultiplayerGame(code, room.mapa, players);
-            }
+            const list = document.getElementById('playersList');
+            list.innerHTML = '';
+            for(let id in players) list.innerHTML += `<li>👤 ${players[id].displayName} ${players[id].alive ? '❤️' : '💀'}</li>`;
+            if(room.estado === 'playing') startMultiplayerGame(code, room.mapa, players);
         });
         document.getElementById('startGameBtn').onclick = async () => {
-            if(!isCreator) return;
+            if(!isRoomCreator) return;
             const snap = await db.ref(`salas/${code}`).once('value');
-            const room = snap.val();
-            if(Object.keys(room.jugadores).length < 2) { alert("Mínimo 2 jugadores para empezar"); return; }
+            if(Object.keys(snap.val().jugadores).length < 2) { alert("Necesitas al menos 2 jugadores"); return; }
             await db.ref(`salas/${code}/estado`).set('playing');
         };
         document.getElementById('leaveRoomBtn').onclick = () => leaveRoom();
     }
     async function leaveRoom() {
         if(activeRoomCode) {
-            const roomRef = db.ref(`salas/${activeRoomCode}`);
-            if(isRoomCreator) await roomRef.remove();
-            else await roomRef.child(`jugadores/${currentUser.uid}`).remove();
+            if(isRoomCreator) await db.ref(`salas/${activeRoomCode}`).remove();
+            else await db.ref(`salas/${activeRoomCode}/jugadores/${currentUser.uid}`).remove();
         }
         activeRoomCode = null;
         roomLobbyPanel.classList.add('oculto');
         lobbyPanel.classList.remove('oculto');
         db.ref(`salas/${activeRoomCode}`).off();
     }
-    function generateRoomCode(len) { return Math.random().toString(36).substring(2,2+len).toUpperCase() + Math.floor(Math.random()*999); }
 
-    // -------------------- MODO BOTS (10 Bots, último en pie) --------------------
-    class GameEngine {
+    // ===================== MOTOR DEL JUEGO (survev.io style) =====================
+    class SurvivalGame {
         constructor(canvas, mode, roomData = null) {
             this.canvas = canvas;
             this.ctx = canvas.getContext('2d');
-            this.mode = mode; // 'bots' or 'multi'
-            this.roomCode = roomData?.code;
-            this.playersMap = roomData?.players || {};
-            this.localPlayerId = currentUser.uid;
+            this.mode = mode; // 'bots' o 'multi'
             this.width = canvas.width;
             this.height = canvas.height;
-            this.local = { x: this.width/2, y: this.height/2, health: 100, angle: 0, kills: 0, alive: true, char: userData.activeChar };
+            this.localId = currentUser.uid;
+            this.local = { x: this.width/2, y: this.height/2, health: 100, kills: 0, angle: 0, alive: true, char: userData.activeChar };
             this.bullets = [];
-            this.enemies = []; // solo para bots
-            this.playersList = []; // multi: otros jugadores
+            this.bots = [];      // solo para bots
+            this.otherPlayers = []; // multi
             this.gameOver = false;
-            this.result = null;
-            this.lastShoot = 0;
+            this.resultRank = null;
+            this.lastShot = 0;
             this.keys = { w: false, s: false, a: false, d: false };
             this.mouseX = this.width/2, this.mouseY = this.height/2;
-            this.frame = 0;
-            this.initListeners();
-            if(mode === 'bots') this.initBots();
-            if(mode === 'multi') this.initMultiplayerSync();
+            this.joystickDir = { x: 0, y: 0 };
+            this.initControls();
+            if(mode === 'bots') this.initBots(10);
+            if(mode === 'multi') this.initMultiplayer(roomData);
+            this.startLoop();
         }
-        initBots() {
-            for(let i=0;i<10;i++) {
-                this.enemies.push({ x: Math.random()*this.width, y: Math.random()*this.height, health: 50, size: 16, shootCooldown: 0, id: i });
-            }
+        initBots(count) {
+            for(let i=0;i<count;i++) this.bots.push({ x: Math.random()*this.width, y: Math.random()*this.height, health: 60, shootCd: 0, id: i });
         }
-        initMultiplayerSync() {
-            // suscribirse a jugadores en sala
-            const roomRef = db.ref(`salas/${this.roomCode}/jugadores`);
-            roomRef.on('value', (snap) => {
+        initMultiplayer(roomData) {
+            this.roomCode = roomData.code;
+            this.roomRef = db.ref(`salas/${this.roomCode}/jugadores`);
+            this.roomRef.on('value', (snap) => {
                 const data = snap.val() || {};
-                this.playersList = [];
+                this.otherPlayers = [];
                 for(let uid in data) {
-                    if(uid === this.localPlayerId) continue;
+                    if(uid === this.localId) continue;
                     const p = data[uid];
-                    if(p.alive && p.health > 0) {
-                        this.playersList.push({ uid, x: p.x || 50, y: p.y || 50, health: p.health, displayName: p.displayName, char: p.char });
-                    }
+                    if(p.alive && p.health > 0) this.otherPlayers.push({ uid, x: p.x||100, y: p.y||100, health: p.health, name: p.displayName, char: p.char });
                 }
             });
-            // enviar posición cada 2 frames
             this.posInterval = setInterval(() => {
-                if(!this.gameOver && this.local.alive) {
-                    db.ref(`salas/${this.roomCode}/jugadores/${this.localPlayerId}`).update({ x: this.local.x, y: this.local.y, health: this.local.health, alive: true, char: userData.activeChar });
-                }
-            }, 50);
+                if(!this.gameOver && this.local.alive) this.roomRef.child(this.localId).update({ x: this.local.x, y: this.local.y, health: this.local.health, alive: true });
+            }, 60);
         }
-        handleDamage(targetUid, damage) {
-            if(this.mode === 'multi' && targetUid !== this.localPlayerId) {
-                db.ref(`salas/${this.roomCode}/jugadores/${targetUid}/health`).transaction(h => (h||100)-damage);
+        initControls() {
+            // teclado
+            window.addEventListener('keydown', (e) => { if(e.key === 'w') this.keys.w=true; if(e.key === 's') this.keys.s=true; if(e.key === 'a') this.keys.a=true; if(e.key === 'd') this.keys.d=true; });
+            window.addEventListener('keyup', (e) => { if(e.key === 'w') this.keys.w=false; if(e.key === 's') this.keys.s=false; if(e.key === 'a') this.keys.a=false; if(e.key === 'd') this.keys.d=false; });
+            // ratón / tacto (apuntar)
+            this.canvas.addEventListener('mousemove', (e) => { const rect = this.canvas.getBoundingClientRect(); const scaleX = this.canvas.width/rect.width; this.mouseX = (e.clientX - rect.left)*scaleX; this.mouseY = (e.clientY - rect.top)*scaleX; });
+            this.canvas.addEventListener('touchmove', (e) => { e.preventDefault(); const rect = this.canvas.getBoundingClientRect(); const touch = e.touches[0]; const scaleX = this.canvas.width/rect.width; this.mouseX = (touch.clientX - rect.left)*scaleX; this.mouseY = (touch.clientY - rect.top)*scaleX; });
+            this.canvas.addEventListener('touchstart', (e) => e.preventDefault());
+            // Joystick móvil
+            const joyArea = document.getElementById('joystickContainer');
+            const joyBase = document.getElementById('joystickBase');
+            let activeTouch = false;
+            const onJoyMove = (e) => {
+                e.preventDefault();
+                const rect = joyArea.getBoundingClientRect();
+                const touch = e.touches[0];
+                let dx = (touch.clientX - rect.left) - 65;
+                let dy = (touch.clientY - rect.top) - 65;
+                let dist = Math.hypot(dx,dy);
+                let angle = Math.atan2(dy,dx);
+                let maxDist = 45;
+                if(dist > maxDist) { dx = Math.cos(angle)*maxDist; dy = Math.sin(angle)*maxDist; dist = maxDist; }
+                joyBase.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+                let normX = dx/maxDist, normY = dy/maxDist;
+                this.joystickDir = { x: normX, y: normY };
+            };
+            joyArea.addEventListener('touchstart', (e) => { e.preventDefault(); activeTouch = true; onJoyMove(e); });
+            joyArea.addEventListener('touchmove', onJoyMove);
+            joyArea.addEventListener('touchend', () => { joyBase.style.transform = 'translate(-50%, -50%)'; this.joystickDir = { x: 0, y: 0 }; });
+            // disparo automático cada 250ms
+            setInterval(() => { if(!this.gameOver && this.local.alive) this.shoot(); }, 220);
+        }
+        shoot() {
+            let angle = Math.atan2(this.mouseY - this.local.y, this.mouseX - this.local.x);
+            this.bullets.push({ x: this.local.x, y: this.local.y, vx: Math.cos(angle)*11, vy: Math.sin(angle)*11, life: 90, size: 6, owner: 'local', damage: 28 });
+        }
+        updateMovement() {
+            let moveX = 0, moveY = 0;
+            if(this.keys.w || this.keys.s || this.keys.a || this.keys.d) {
+                if(this.keys.w) moveY -= 1; if(this.keys.s) moveY += 1; if(this.keys.a) moveX -= 1; if(this.keys.d) moveX += 1;
+                let len = Math.hypot(moveX,moveY); if(len>0) { moveX/=len; moveY/=len; }
+            } else {
+                moveX = this.joystickDir.x; moveY = this.joystickDir.y;
             }
-        }
-        shoot(angle) {
-            this.bullets.push({ x: this.local.x, y: this.local.y, vx: Math.cos(angle)*12, vy: Math.sin(angle)*12, life: 80, size: 5, owner: 'local' });
-        }
-        update() {
-            if(this.gameOver) return;
-            // movimiento
-            let spd = 5;
-            if(this.keys.w) this.local.y -= spd;
-            if(this.keys.s) this.local.y += spd;
-            if(this.keys.a) this.local.x -= spd;
-            if(this.keys.d) this.local.x += spd;
+            let spd = 5.2;
+            this.local.x += moveX * spd;
+            this.local.y += moveY * spd;
             this.local.x = Math.min(Math.max(20, this.local.x), this.width-20);
             this.local.y = Math.min(Math.max(20, this.local.y), this.height-20);
-            const dx = this.mouseX - this.local.x;
-            const dy = this.mouseY - this.local.y;
-            this.local.angle = Math.atan2(dy, dx);
-            if(Date.now() - this.lastShoot > 220) { this.shoot(this.local.angle); this.lastShoot = Date.now(); }
+            // actualizar ángulo de mira
+            let angle = Math.atan2(this.mouseY - this.local.y, this.mouseX - this.local.x);
+            this.local.angle = angle;
+        }
+        updateGame() {
+            if(this.gameOver) return;
+            this.updateMovement();
             // balas
             for(let i=0;i<this.bullets.length;i++) {
                 let b = this.bullets[i];
-                b.x += b.vx; b.y += b.vy;
-                b.life--;
+                b.x += b.vx; b.y += b.vy; b.life--;
                 if(b.x<0||b.x>this.width||b.y<0||b.y>this.height||b.life<=0) { this.bullets.splice(i,1); i--; continue; }
                 // colisiones
                 if(this.mode === 'bots') {
-                    for(let j=0;j<this.enemies.length;j++) {
-                        let e = this.enemies[j];
-                        if(e.health>0 && Math.hypot(b.x-e.x, b.y-e.y)<20) {
-                            e.health -= 34;
+                    for(let j=0;j<this.bots.length;j++) {
+                        let bot = this.bots[j];
+                        if(bot.health>0 && Math.hypot(b.x-bot.x, b.y-bot.y) < 22) {
+                            bot.health -= b.damage;
                             this.bullets.splice(i,1); i--;
-                            if(e.health<=0) { this.enemies.splice(j,1); this.local.kills++; document.getElementById('gameKills').innerText=this.local.kills; }
+                            if(bot.health<=0) { this.bots.splice(j,1); this.local.kills++; document.getElementById('gameKills').innerText = this.local.kills; }
                             break;
                         }
                     }
                 } else if(this.mode === 'multi') {
-                    for(let p of this.playersList) {
-                        if(p.health>0 && Math.hypot(b.x-p.x, b.y-p.y)<24) {
-                            this.handleDamage(p.uid, 30);
+                    for(let p of this.otherPlayers) {
+                        if(p.health>0 && Math.hypot(b.x-p.x, b.y-p.y) < 26) {
+                            db.ref(`salas/${this.roomCode}/jugadores/${p.uid}/health`).transaction(h => (h||100)-b.damage);
                             this.bullets.splice(i,1); i--;
                             break;
                         }
                     }
                 }
+                // daño a local por balas enemigas (bots)
+                if(this.mode === 'bots' && b.owner === 'bot' && Math.hypot(b.x-this.local.x, b.y-this.local.y) < 24) {
+                    this.local.health -= 18;
+                    this.bullets.splice(i,1);
+                    if(this.local.health<=0) this.gameOver = true;
+                }
             }
+            // IA bots
             if(this.mode === 'bots') {
-                for(let e of this.enemies) {
-                    let ang = Math.atan2(this.local.y - e.y, this.local.x - e.x);
-                    e.x += Math.cos(ang)*2.2;
-                    e.y += Math.sin(ang)*2.2;
-                    e.shootCooldown--;
-                    if(e.shootCooldown<=0 && Math.hypot(this.local.x-e.x, this.local.y-e.y)<300) {
-                        let bulletAng = Math.atan2(this.local.y - e.y, this.local.x - e.x);
-                        this.bullets.push({ x:e.x, y:e.y, vx:Math.cos(bulletAng)*8, vy:Math.sin(bulletAng)*8, life:60, size:4, owner:'bot' });
-                        e.shootCooldown=45;
+                for(let bot of this.bots) {
+                    let angleTo = Math.atan2(this.local.y - bot.y, this.local.x - bot.x);
+                    bot.x += Math.cos(angleTo)*1.8;
+                    bot.y += Math.sin(angleTo)*1.8;
+                    bot.shootCd--;
+                    if(bot.shootCd<=0 && Math.hypot(this.local.x-bot.x, this.local.y-bot.y) < 350) {
+                        let ang = Math.atan2(this.local.y - bot.y, this.local.x - bot.x);
+                        this.bullets.push({ x: bot.x, y: bot.y, vx: Math.cos(ang)*7, vy: Math.sin(ang)*7, life: 70, owner: 'bot', damage: 15 });
+                        bot.shootCd = 45;
                     }
                 }
-                // colisiones balas enemigas con jugador
-                for(let i=0;i<this.bullets.length;i++) {
-                    let b = this.bullets[i];
-                    if(b.owner === 'bot' && Math.hypot(b.x-this.local.x, b.y-this.local.y)<22) {
-                        this.local.health -= 18;
-                        this.bullets.splice(i,1);
-                        if(this.local.health<=0) this.gameOver=true;
-                        break;
-                    }
-                }
-                if(this.enemies.length===0 && !this.gameOver) this.gameOver=true, this.result='win';
-                if(this.local.health<=0) this.gameOver=true, this.result='lose';
-            } else { // multi: verificar muerte local
-                const snapPlayer = db.ref(`salas/${this.roomCode}/jugadores/${this.localPlayerId}`);
-                snapPlayer.once('value', (s)=> { if(s.val()?.health<=0) this.gameOver=true; });
+                if(this.bots.length === 0 && !this.gameOver) { this.gameOver = true; this.resultRank = 1; }
+                if(this.local.health <= 0) { this.gameOver = true; this.resultRank = this.bots.length + 1; }
+            } else {
+                // modo multi: verificar si el local murió
+                db.ref(`salas/${this.roomCode}/jugadores/${this.localId}/health`).once('value', snap => { if(snap.val() <= 0) this.gameOver = true; });
             }
             if(this.gameOver) this.endMatch();
         }
         async endMatch() {
             if(this.mode === 'bots') {
                 let reward = 0;
-                if(this.result==='win' && this.enemies.length===0) reward=10;
-                else if(this.enemies.length===1) reward=5;
-                else if(this.enemies.length===2) reward=2;
-                if(reward>0) { userData.coins += reward; await saveUserData(); updateUIMonets(); alert(`🎉 Partida finalizada! +${reward} monedas.`); }
-                else alert("💀 Has muerto. Sigue entrenando.");
-            } else if(this.mode === 'multi') {
+                if(this.resultRank === 1) reward = 10;
+                else if(this.resultRank === 2) reward = 5;
+                else if(this.resultRank === 3) reward = 2;
+                if(reward > 0) { userData.coins += reward; await saveUser(); updateUI(); alert(`🏆 +${reward} monedas!`); }
+                else alert("💀 Eliminado. ¡Sigue así!");
+            } else {
                 alert("🏁 Partida multijugador finalizada.");
-                await db.ref(`salas/${this.roomCode}`).remove();
+                if(activeRoomCode) await db.ref(`salas/${activeRoomCode}`).remove();
             }
             if(this.posInterval) clearInterval(this.posInterval);
+            if(this.roomRef) this.roomRef.off();
             if(gameLoopId) cancelAnimationFrame(gameLoopId);
             gamePanel.classList.add('oculto');
             lobbyPanel.classList.remove('oculto');
             if(activeRoomCode) leaveRoom();
-            gameEngine = null;
+            currentGame = null;
         }
         draw() {
             this.ctx.clearRect(0,0,this.width,this.height);
-            this.ctx.fillStyle = '#1f3a2f';
-            this.ctx.fillRect(0,0,this.width,this.height);
-            this.ctx.fillStyle = '#5a8f4c';
-            for(let i=0;i<200;i++) this.ctx.fillRect(Math.random()*this.width, Math.random()*this.height,3,3);
-            // dibujar jugadores (multi)
-            if(this.mode === 'multi') {
-                for(let p of this.playersList) {
-                    this.ctx.fillStyle = '#e67e22';
-                    this.ctx.beginPath(); this.ctx.arc(p.x, p.y, 18,0,Math.PI*2); this.ctx.fill();
-                    this.ctx.fillStyle = 'white'; this.ctx.font='bold 12px monospace'; this.ctx.fillText(p.displayName,p.x-20,p.y-18);
-                    this.ctx.fillStyle = 'red'; this.ctx.fillRect(p.x-20,p.y+15,40*(p.health/100),6);
-                }
+            this.ctx.fillStyle = '#1e4a2f'; this.ctx.fillRect(0,0,this.width,this.height);
+            // detalles
+            for(let i=0;i<300;i++) { this.ctx.fillStyle = '#6aab5a'; this.ctx.fillRect(Math.random()*this.width, Math.random()*this.height, 2,2); }
+            // dibujar bots
+            for(let b of this.bots) {
+                this.ctx.fillStyle = '#b03a2e'; this.ctx.beginPath(); this.ctx.arc(b.x, b.y, 17,0,Math.PI*2); this.ctx.fill();
+                this.ctx.fillStyle = 'white'; this.ctx.font = 'bold 10px monospace'; this.ctx.fillText('🤖', b.x-8, b.y-12);
             }
-            // enemigos bots
-            for(let e of this.enemies) {
-                this.ctx.fillStyle = '#c0392b';
-                this.ctx.beginPath(); this.ctx.arc(e.x, e.y, 16,0,Math.PI*2); this.ctx.fill();
-                this.ctx.fillStyle = 'white'; this.ctx.fillText('BOT',e.x-12,e.y-12);
+            // otros jugadores
+            for(let p of this.otherPlayers) {
+                this.ctx.fillStyle = '#e67e22'; this.ctx.beginPath(); this.ctx.arc(p.x, p.y, 18,0,Math.PI*2); this.ctx.fill();
+                this.ctx.fillStyle = 'white'; this.ctx.fillText(p.name, p.x-15, p.y-18);
+                this.ctx.fillStyle = 'red'; this.ctx.fillRect(p.x-20, p.y+15, 40*(p.health/100), 5);
             }
             // jugador local
-            const grad = this.ctx.createLinearGradient(this.local.x-10, this.local.y-10, this.local.x+10, this.local.y+10);
-            grad.addColorStop(0,'#f1c40f');
-            grad.addColorStop(1,'#e67e22');
+            const grad = this.ctx.createLinearGradient(this.local.x-12, this.local.y-12, this.local.x+12, this.local.y+12);
+            grad.addColorStop(0, '#ffcc44'); grad.addColorStop(1, '#ff8800');
             this.ctx.fillStyle = grad;
-            this.ctx.beginPath(); this.ctx.arc(this.local.x, this.local.y, 20,0,Math.PI*2); this.ctx.fill();
-            this.ctx.fillStyle = 'white';
-            this.ctx.font = 'bold 14px sans-serif';
-            this.ctx.fillText(`👤 ${currentUser.email.split('@')[0]}`, this.local.x-30, this.local.y-25);
-            this.ctx.fillStyle = 'red'; this.ctx.fillRect(this.local.x-25, this.local.y+22, 50*(this.local.health/100), 6);
-            // arma / linea dirección
-            this.ctx.beginPath(); this.ctx.moveTo(this.local.x, this.local.y); this.ctx.lineTo(this.local.x+Math.cos(this.local.angle)*30, this.local.y+Math.sin(this.local.angle)*30); this.ctx.strokeStyle='white'; this.ctx.lineWidth=3; this.ctx.stroke();
-            for(let b of this.bullets) { this.ctx.fillStyle = 'orange'; this.ctx.beginPath(); this.ctx.arc(b.x,b.y,5,0,Math.PI*2); this.ctx.fill(); }
+            this.ctx.beginPath(); this.ctx.arc(this.local.x, this.local.y, 22,0,Math.PI*2); this.ctx.fill();
+            this.ctx.fillStyle = 'white'; this.ctx.font = 'bold 14px sans-serif'; this.ctx.fillText(currentUser.email.split('@')[0], this.local.x-30, this.local.y-28);
+            this.ctx.fillStyle = '#ff5555'; this.ctx.fillRect(this.local.x-25, this.local.y+25, 50*(this.local.health/100), 6);
+            // arma
+            this.ctx.beginPath(); this.ctx.moveTo(this.local.x, this.local.y); this.ctx.lineTo(this.local.x+Math.cos(this.local.angle)*32, this.local.y+Math.sin(this.local.angle)*32); this.ctx.strokeStyle='gold'; this.ctx.lineWidth=4; this.ctx.stroke();
+            for(let b of this.bullets) { this.ctx.fillStyle = '#ffaa33'; this.ctx.beginPath(); this.ctx.arc(b.x, b.y, 5,0,Math.PI*2); this.ctx.fill(); }
             document.getElementById('gameHealth').innerText = Math.max(0,this.local.health);
         }
-        initListeners() {
-            window.addEventListener('keydown', (e) => { if(e.key === 'w') this.keys.w=true; if(e.key === 's') this.keys.s=true; if(e.key === 'a') this.keys.a=true; if(e.key === 'd') this.keys.d=true; });
-            window.addEventListener('keyup', (e) => { if(e.key === 'w') this.keys.w=false; if(e.key === 's') this.keys.s=false; if(e.key === 'a') this.keys.a=false; if(e.key === 'd') this.keys.d=false; });
-            this.canvas.addEventListener('mousemove', (e) => { const rect = this.canvas.getBoundingClientRect(); const scaleX = this.canvas.width/rect.width; this.mouseX = (e.clientX - rect.left)*scaleX; this.mouseY = (e.clientY - rect.top)*scaleX; });
-        }
-        startLoop() { const updateLoop = () => { this.update(); this.draw(); gameLoopId = requestAnimationFrame(updateLoop); }; updateLoop(); }
+        startLoop() { const tick = () => { this.updateGame(); this.draw(); gameLoopId = requestAnimationFrame(tick); }; tick(); }
     }
 
     async function startBotsMatch() {
         lobbyPanel.classList.add('oculto');
         gamePanel.classList.remove('oculto');
         const canvas = document.getElementById('gameCanvas');
-        gameEngine = new GameEngine(canvas, 'bots');
-        gameEngine.startLoop();
-        document.getElementById('exitGameBtn').onclick = () => { if(gameEngine) gameEngine.gameOver=true; };
+        currentGame = new SurvivalGame(canvas, 'bots');
+        document.getElementById('exitGameBtn').onclick = () => { if(currentGame) currentGame.gameOver = true; };
     }
-    async function startMultiplayerGame(roomCode, mapa, playersObj) {
+    async function startMultiplayerGame(roomCode, mapa, players) {
         lobbyPanel.classList.add('oculto');
         roomLobbyPanel.classList.add('oculto');
         gamePanel.classList.remove('oculto');
         const canvas = document.getElementById('gameCanvas');
-        gameEngine = new GameEngine(canvas, 'multi', { code: roomCode, players: playersObj });
-        gameEngine.startLoop();
-        document.getElementById('exitGameBtn').onclick = () => { if(gameEngine) gameEngine.gameOver=true; };
+        currentGame = new SurvivalGame(canvas, 'multi', { code: roomCode });
+        document.getElementById('exitGameBtn').onclick = () => { if(currentGame) currentGame.gameOver = true; };
     }
-    // Funcion aux
-    window.startBotsMatch = startBotsMatch;
 </script>
 </body>
 </html>
